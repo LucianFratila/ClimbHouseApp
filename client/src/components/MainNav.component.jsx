@@ -85,7 +85,9 @@ function MainNav(props) {
           <Nav.Item>
             <Nav.Link href="/logs">Logs</Nav.Link>
           </Nav.Item>
-          
+          <Nav.Item>
+            <Nav.Link href="/rules">Rules</Nav.Link>
+          </Nav.Item>
         </Nav>
         <Navbar.Text >
           <div style={{ justifyContent:'space-between'}}>
