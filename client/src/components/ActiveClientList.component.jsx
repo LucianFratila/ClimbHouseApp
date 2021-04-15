@@ -144,7 +144,7 @@ function ClientList(){
     <div>
         <Row > 
             <span style={{marginTop:'10px',marginLeft:'15px',marginRight:'15px'}}>
-                <h4>Active Clients on Site</h4>
+                <h4>Active Clients</h4>
                 <h6>No of users: {clients.length} / Total Climbers in Gym: {totalClimbers}</h6>
             </span>
         </Row>
