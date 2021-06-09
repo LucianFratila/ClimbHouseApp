@@ -455,9 +455,9 @@ function ClientList(){
             >
                 Results: {searchClients.length} {searchClients.length===0?'':' / Show Results'}
             </Button>
-            <span style={{marginLeft:'20px'}}>
+            {/* <span style={{marginLeft:'20px'}}>
             Filter by entry time <Button variant='info' onClick={toggleFilterClients}>{reverseOrder===false?<FaArrowCircleUp/>:<FaArrowCircleDown/>}</Button>
-            </span>
+            </span> */}
             
 
             <MyVerticallyCenteredModal
@@ -479,7 +479,7 @@ function ClientList(){
         {/* reverseOrder,setReverseOrder  */}
         
         {
-            clients.sort((a,b)=> reverseOrder===false ? b.timeIn<a.timeIn : a.timeIn<b.timeIn ? 1 : -1).map( client=>(
+            clients.sort((a,b)=> b.timeIn<a.timeIn ? 1 : -1).map( client=>(
                 <Col style={{padding:'5px'}} key={client._id} >
                     <CardGroup>
                         <Card
