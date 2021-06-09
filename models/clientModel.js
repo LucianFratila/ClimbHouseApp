@@ -10,6 +10,10 @@ let clientsSchema = new mongoose.Schema({
         type:String,
         unique:true 
     },
+    phone:{
+        type:String,
+        unique:true 
+    },
     timeIn:{
         type: Number,
         default: 0

@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner'
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-import { FaPlay, FaStop, FaUndo } from 'react-icons/fa';
+import { FaExclamationTriangle, FaPlay, FaStop, FaUndo } from 'react-icons/fa';
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 function ResetButton(props){
 
@@ -38,7 +38,7 @@ useEffect(() => {
 
 const handleClick = () => {
   confirmAlert({
-    title: 'Reset time!',
+    title: '!!! Kicking Out !!!',
     message:`${props.name} > ${props.due.toString()}/lei @ ${props.time.toString()}/min`,
     buttons: [
       {
@@ -82,7 +82,7 @@ return(
       
       </span>
       
-    : <FaUndo size='1.4em' />}
+    : <span><FaExclamationTriangle size='25px'/> <span>Kick Out</span></span>}
     </Button>
 )
 }

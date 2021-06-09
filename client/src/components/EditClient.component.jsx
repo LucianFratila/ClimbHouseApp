@@ -9,7 +9,7 @@ import Card from 'react-bootstrap/Card'
 import ProductsSelectForm from './ProductsSelectForm.component'
 import SubscriptionButton from './SubscriptionButton.component'
 import DeleteProdsHistory from './DeleteProdsHistory.component'
-import { FaEnvelope, FaUserCircle,FaUsers,FaCartPlus,FaCalendarCheck, FaTimesCircle, FaTimes, FaClock, FaTools } from 'react-icons/fa';
+import { FaEnvelope, FaUserCircle,FaUsers,FaCartPlus,FaCalendarCheck, FaTimesCircle, FaTimes, FaClock, FaTools, FaPhone } from 'react-icons/fa';
 import { IoMdWalk,IoMdTimer } from "react-icons/io";
 import StopButton from './StopButton.component'
 import ResetButton from './ResetButton.component'
@@ -25,6 +25,7 @@ function EditClient(props) {
     const [status, setStatus] = useState();
     const [kids, setKids] = useState(0);
     const [name,setName] = useState('');
+    const [phone,setPhone] = useState('');
     const [email,setEmail] = useState('');
     const [prods,setProds] = useState([]);
     const [alert, setAlert] = useState(false);
@@ -123,6 +124,7 @@ function EditClient(props) {
                 setEmail(result.data.data.client.email);
                 setStatus(result.data.data.client.status);
                 setProds(result.data.data.products);
+                setPhone(result.data.data.client.phone);
                 setProdhistory(result.data.data.client.prodHistory);
                 setDue(result.data.data.client.due);
                 setFinalTime(result.data.data.client.finalTime)
@@ -189,8 +191,9 @@ function EditClient(props) {
                
                 <Container >
                     <Row >
-                        <Col  style={{backgroundColor:'#2b2b2b',display: 'flex',alignItems:'center'}} sm={8}><FaUserCircle size='1.4em'/><span style={{marginLeft:'5px',fontSize:'30px'}}>{name}</span></Col>
-                        <Col  style={{backgroundColor:'#2f2e2e',display: 'flex',alignItems:'center'}} sm={4}><FaEnvelope/> <span style={{marginLeft:'5px'}}>{email}</span></Col>
+                        <Col  style={{backgroundColor:'#2b2b2b',display: 'flex',alignItems:'center'}} sm={6}><FaUserCircle size='1.4em'/><span style={{marginLeft:'5px',fontSize:'30px'}}>{name}</span></Col>
+                        <Col  style={{backgroundColor:'#2f2e2e',display: 'flex',alignItems:'center'}} sm={3}><FaEnvelope/> <span style={{marginLeft:'5px'}}>{email}</span></Col>
+                        <Col  style={{backgroundColor:'#2f2e2e',display: 'flex',alignItems:'center'}} sm={3}><FaPhone/> <span style={{marginLeft:'5px'}}>{phone}</span></Col>
                     </Row>
                     <Row xl={4} lg={4} md={2} sm={1} xs={1} style={{backgroundColor:'#404040'}} >
                         <Col style={{display: 'flex',alignItems:'center'}}  sm><IoMdWalk size='1em'/><span style={{marginLeft:'5px'}}> User: {status === true ? 'Active' : 'Not Active'}</span></Col>
@@ -236,12 +239,22 @@ function EditClient(props) {
                     <Col  style={{backgroundColor:'#2f2e2e',display: 'flex',alignItems:'center'}}><FaTools size='1.4em'/> <span style={{marginLeft:'5px',fontSize:'20px',padding:'10px'}}>Time/Subscription Control</span></Col>
                     </Row>
                     <Row>
-                    <Col  style={{backgroundColor:'#2f2e2e',display: 'flex',alignItems:'center'}}>
-                    <ButtonGroup size="lg" className="mb-2">
-                    <SubscriptionButton toggleFunction={toggle} subscription={sub} refresh={refresh} />
-                    <StopButton ClientId={props.match.params.id} refresh={refresh} timeOut={timeOut} status={status} name={name}/>
-                    <ResetButton ClientId={props.match.params.id} refresh={refresh} name={name} due={due} time={finalTime}/> 
-                    </ButtonGroup>
+                    <Col  style={{backgroundColor:'#2f2e2e',alignItems:'center'}}>
+                      <span>
+                          <span>
+                          <ButtonGroup size="lg" className="mb-2">
+                          <SubscriptionButton toggleFunction={toggle} subscription={sub} refresh={refresh} />
+                          <StopButton ClientId={props.match.params.id} refresh={refresh} timeOut={timeOut} status={status} name={name}/>
+                          
+                          </ButtonGroup>
+                          </span>
+                          
+                          <span style={{float:'right'}}>
+                          <ResetButton ClientId={props.match.params.id} refresh={refresh} name={name} due={due} time={finalTime}/> 
+                          </span>
+                      </span>
+                      
+                    
                     </Col>
                     </Row>
                     <Row>

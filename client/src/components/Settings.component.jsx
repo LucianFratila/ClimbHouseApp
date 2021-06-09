@@ -64,7 +64,7 @@ function Settings(props){
                     <CreateProduct sendRefresh={refreshFunction}/>
                 </Col>
                 <Col>
-                    <h3>Edit gym price</h3>
+                    <h3>Edit gym price / per 30 min</h3>
                     <EditGymPrice sendRefresh={refreshFunction}/>
                 </Col>
                 

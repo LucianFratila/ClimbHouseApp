@@ -36,3 +36,13 @@
     transform: rotate(360deg);
   }
 }
+.customModal4Active{
+  background-color: #282c34 !important;
+}
+
+.scrollableContent {
+  
+  background-color: #282c34;
+  position: absolute;
+  
+}

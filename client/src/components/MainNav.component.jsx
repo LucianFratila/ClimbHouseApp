@@ -59,32 +59,39 @@ function MainNav(props) {
       
        
       <Navbar.Brand>
+      <a href="/active">
       <img
         src={logo}
-        width="60"
-        height="60"
+        width="80"
+        height="80"
         className="d-inline-block align-top"
         alt="React Bootstrap logo"
+        
       />
+      </a>
+      
     </Navbar.Brand>
       <Navbar.Toggle  aria-controls="basic-navbar-nav" />
       <Navbar.Collapse  id="basic-navbar-nav">
         <Nav className="mr-auto">
           {/* <Nav.Link href="#home">Home</Nav.Link>
           <Nav.Link href="#link">Link</Nav.Link> */}
-          <NavDropdown title="Clients" id="basic-nav-dropdown">
-            <NavDropdown.Item href="/">All Clients</NavDropdown.Item>
-            <NavDropdown.Item href="/active">Active Clients</NavDropdown.Item>
+          <Nav.Item>
+            <Nav.Link href="/">All Clinets</Nav.Link>
+          </Nav.Item>
+          
+          <Nav.Item>
+            <Nav.Link href="/active">Active Clients</Nav.Link>
+          </Nav.Item>
+          
+          <NavDropdown title="Settings" id="basic-nav-dropdown">
+            <NavDropdown.Item href="/settings">Tarifs and Products</NavDropdown.Item>
+            <NavDropdown.Item href="/signup">Register admin</NavDropdown.Item>
+            <NavDropdown.Item href="/logs">Logs</NavDropdown.Item>
           </NavDropdown>
-          <Nav.Item>
-            <Nav.Link href="/settings">Settings</Nav.Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Nav.Link href="/signup">Register admin</Nav.Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Nav.Link href="/logs">Logs</Nav.Link>
-          </Nav.Item>
+          
+          
+          
           <Nav.Item>
             <Nav.Link href="/rules">Rules</Nav.Link>
           </Nav.Item>

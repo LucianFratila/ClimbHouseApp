@@ -4,6 +4,7 @@ import axios from 'axios';
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
+import Button from 'react-bootstrap/Button'
 import ListGroup from 'react-bootstrap/ListGroup'
 
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
@@ -13,7 +14,35 @@ const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
 function AdminLogs(props) {
     const [log,setLog] = useState([])
+    const [isLoading,setLoading] = useState(false)
+
+    console.log(isLoading);
+
+    const deleteAllLogs =async ()=>{
+
+        
+        try {
+        const url = `${SERVER_URL}/admins/delete/alllogs`;
+        setLoading(true)
+        const response = await axios({
+            method: 'POST',
+            url: url,
+            
+            
+          })
+          } catch (err) {
+            console.log(err);
+            
+          }
+        
+        setLoading(false)
+         
+        
+    }
     
+    const onSubmitDeleteAllLogs = () =>{
+        deleteAllLogs()
+    }
     // console.log(props.match.params.firebaseID);
     useEffect(()=>{
         let mounted = true;
@@ -23,29 +52,14 @@ function AdminLogs(props) {
                     return `${SERVER_URL}/admins/` ;
                   }
                 const result = await axios.get(getFetchUrl());
-                // console.log(result.data.log[0].activityHistory.logs);
-                // setEmail(result.data.data.admin.email);
-                // setName(result.data.data.admin.name);
                 let datalogs
                 try {
+                    
                     datalogs = result.data.log[0].activityHistory.logs
                     setLog(datalogs)
                 } catch (error) {
                     console.log('Error: No logs yet');
                 }
-                
-                // if (datalogs===undefined) {
-                //     return datalogs = 0
-                // } else {
-                //     datalogs
-                // }
-                
-                
-                
-                
-
-                
-                
               }
               fetchData()
         }
@@ -55,7 +69,7 @@ function AdminLogs(props) {
         
          
         
-    },[])
+    },[isLoading])
     
     let allTimeTotals = log.reduce((accumulator, current) => accumulator + current.due, 0);
     
@@ -67,7 +81,19 @@ function AdminLogs(props) {
                 <Container >
                 
                     <Row xl={1} lg={1} md={1} sm={1} xs={1} style={{backgroundColor:'#404040'}} >
-                        <Col><h5>Logs / All Time : {`${allTimeTotals} lei`} </h5></Col>
+                        <Col>
+                        <h5>Logs / All Time : {`${allTimeTotals} lei`} </h5>
+                        {/* <Button variant='danger' onClick={onSubmitDeleteAllLogs}>
+                            {
+                            isLoading===true
+                            ?
+                            `Deleting`
+                            :
+                            `Delete all Logs`
+                            }
+                            
+                        </Button> */}
+                        </Col>
                         <Col>{
                             log.length===0
                             ?

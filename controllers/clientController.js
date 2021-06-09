@@ -53,6 +53,26 @@ const settings = await Settings.find()
   });
 });
 
+////Search Clients for Active Page
+exports.searchAllClients4ActivePage = catchAsync(async (req, res, next) => {
+
+
+  let search = req.query.search
+  
+
+const clients = await Client.find({'name' : new RegExp(search, 'i')})
+
+  res.status(200).json({
+      clients
+  });
+});
+
+
+
+
+
+
+
 ///GET ACTIVE CLIENTS
 exports.getActiveClients = catchAsync(async (req, res, next) => {
   const clients = await Client.find({ status: true }).exec();
@@ -108,6 +128,21 @@ exports.getClient = catchAsync(async (req, res, next) => {
       client,
       products
      }
+  });
+
+});
+
+///GET SPECIFIC CLIENT 4 active page
+exports.getClient4Active = catchAsync(async (req, res, next) => {
+  const client = await Client.findById(req.params.id)
+  
+
+  if (!client) {
+    return next(new AppError("No client found with that ID", 404));
+  }
+
+  res.status(200).json({
+    client
   });
 
 });
@@ -436,6 +471,25 @@ exports.timeEnd = catchAsync(async (req, res, next) => {
   else {
     aftertimeEnd.due = a*(c+(Math.ceil((y-35)/15))*5) + b*(d+(Math.ceil((y-35)/15))*5)
   }
+
+
+
+// let a = 0 //nr copii
+// let b = 2 //nr adulti
+// let c = 20 //pret copii
+// let d = 25 //pret adulti
+
+// let y = 179//timp scurs in minute
+
+// let x = (a*c)+(b*d)
+// let z // pret final rotunjit in sus
+
+// if (y <= 35) {
+//   z = x
+// }
+// else {
+//   z = a*(c+(Math.ceil((y-35)/15))*5) + b*(d+(Math.ceil((y-35)/15))*5)
+// }
 
 
 //////////// LOGIC for Subscription ////////////////////

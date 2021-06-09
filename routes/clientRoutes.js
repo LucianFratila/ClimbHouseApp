@@ -9,6 +9,10 @@ router
 .get(clientController.getAllClients)//get all clients
 
 router
+.route("/search4active/")
+.get(clientController.searchAllClients4ActivePage)//get all clients
+
+router
 .route("/active")
 .get(clientController.getActiveClients)//get active clients
 
@@ -23,6 +27,10 @@ router
 router
 .route("/:id")
 .get(clientController.getClient)//get client by id 
+
+router
+.route("/4active/:id")
+.get(clientController.getClient4Active)//get client by id 4 active
 
 router
 .route("/update/:id")

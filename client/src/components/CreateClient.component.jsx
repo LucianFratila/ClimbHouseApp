@@ -42,12 +42,16 @@ function CreateClient(props){
   
         const [isLoading, setLoading] = useState(false);
         const [name,setName] = useState('');
-        const [email,setEmail] = useState('')
+        const [email,setEmail] = useState('');
+        const [phone,setPhone] = useState('');
         const [show, setShow] = useState(false);
         const reRef = useRef();
       
         const onChangeClientName=(e)=>{
             setName(e.target.value)
+            }
+        const onChangeClientPhone=(e)=>{
+            setPhone(e.target.value)
             }
         const onChangeClientEmail=(e)=>{
             setEmail(e.target.value)
@@ -60,7 +64,7 @@ function CreateClient(props){
             e.preventDefault();
             confirmAlert({
                 title: 'Create user!',
-                message: `${name} / Email: ${email}`,
+                message: `${name} / @: ${email} / tel: ${phone}`,
                 buttons: [
                   {
                     label: 'Yes',
@@ -79,12 +83,6 @@ function CreateClient(props){
                 ],
                 overlayClassName: "../index.css"
               })
-            
-            // e.preventDefault();
-            // create()
-            // setLoading(true)
-            // setShow(false)
-            // props.refresh()
         
         };
         
@@ -111,7 +109,7 @@ function CreateClient(props){
             <Alert variant="danger" onClose={() => setShow(false)} dismissible>
             <Alert.Heading>Some error. Please stop that! </Alert.Heading>
             <p>
-            {email} is taken. Try to type in different email.
+            Email or phone is taken.
             </p>
             </Alert>
             :
@@ -141,6 +139,12 @@ function CreateClient(props){
             <InputGroup.Text>@</InputGroup.Text>
             </InputGroup.Prepend>
             <FormControl disabled={!capchaOK} id="inlineFormInputGroupUsername2" type="email" placeholder="Email" onChange={onChangeClientEmail} />
+        </InputGroup>
+        <InputGroup className="mb-2 mr-sm-2">
+            <InputGroup.Prepend>
+            <InputGroup.Text>#</InputGroup.Text>
+            </InputGroup.Prepend>
+            <FormControl disabled={!capchaOK} id="inlineFormInputGroupUsername2" type="tel" placeholder="Phone" onChange={onChangeClientPhone} />
         </InputGroup>
         
         <Button

@@ -160,9 +160,9 @@ function ClientList(props){
                 {/* <SearchClientForm  refresh={refresh}/> */}
                 <Form inline >
         
-                    <Form.Label className="inlineFormInputGroupUsername2" srOnly>
+                    {/* <Form.Label className="inlineFormInputGroupUsername2" srOnly>
                         Email
-                    </Form.Label>
+                    </Form.Label> */}
                     <InputGroup className="mb-2 mr-sm-2">
                         <InputGroup.Prepend>
                         <InputGroup.Text>Search</InputGroup.Text>

@@ -81,3 +81,17 @@ const log = await Admin.aggregate(
     
   });
 });
+
+
+exports.delAllLogs = catchAsync(async (req, res, next) => {
+
+
+  
+  const log = await Admin.updateMany({},{$unset: {activityHistory:1}},{multi: true});
+  
+    res.status(200).json({
+      
+      log
+      
+    });
+  });
