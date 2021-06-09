@@ -26,7 +26,8 @@ function CreateClient(props){
             url: url,
             data:{
                 name,
-                email 
+                email,
+                phone 
             },
             
           })
@@ -43,7 +44,7 @@ function CreateClient(props){
         const [isLoading, setLoading] = useState(false);
         const [name,setName] = useState('');
         const [email,setEmail] = useState('');
-        const [phone,setPhone] = useState('');
+        const [phone,setPhone] = useState();
         const [show, setShow] = useState(false);
         const reRef = useRef();
       
@@ -86,7 +87,7 @@ function CreateClient(props){
         
         };
         
-        const[capchaOK, setCapchaOk] = useState(false)
+        const[capchaOK, setCapchaOk] = useState(true)
         
 
         const CapchaOk = ()=>{
