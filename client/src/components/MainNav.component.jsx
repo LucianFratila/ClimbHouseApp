@@ -77,7 +77,7 @@ function MainNav(props) {
           {/* <Nav.Link href="#home">Home</Nav.Link>
           <Nav.Link href="#link">Link</Nav.Link> */}
           <Nav.Item>
-            <Nav.Link href="/">All Clinets</Nav.Link>
+            <Nav.Link href="/">All Clients</Nav.Link>
           </Nav.Item>
           
           <Nav.Item>
