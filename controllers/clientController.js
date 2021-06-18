@@ -20,14 +20,7 @@ exports.createClient = catchAsync(async (req, res, next) => {
   });
 ///GET ALL CLIENTS
 exports.getAllClients = catchAsync(async (req, res, next) => {
-
-
-  let search = req.query.search
-  
-  // const searchClient = await Client.findOne({ name: 'Croatia' })
-
-
-
+let search = req.query.search
 const climbers = await Client.aggregate(
   [{
       $group: {
@@ -40,14 +33,21 @@ const climbers = await Client.aggregate(
       }
   }]
 );
+
+let sort = req.query.sort ////String:asc&desc
+let limit = parseInt(req.query.limit)////number
+
+
+
 const active = await Client.find({ status: true }).exec();
-const clients = await Client.find({'name' : new RegExp(search, 'i')})
+const clientsLength = await Client.find({});
+const clients = await Client.find({'name' : new RegExp(search, 'i')}).sort({ timeStamp: sort}).limit(limit)
 const settings = await Settings.find()
   res.status(200).json({
       clients,
       adultPrice: settings[0].adultPrice,
       kidPrice: settings[0].kidPrice,
-      results: clients.length,
+      results: clientsLength.length,
       active: active.length,
       // clibersInGym:totalResult
   });
@@ -552,7 +552,7 @@ if (specs.statusSub===true) {
     const adminDetails = await Admin.findOne({fireBaseId:fireBaseIdFrontend})
     // console.log(admin);
 
-    ////////////////////////
+    ////////////////////////LOGS per Admin//////////////////////
     const clientQuery4Admin = await Client.findById(req.params.id)
     let today = new Date();
     let dd = String(today.getDate()).padStart(2, '0');
@@ -567,6 +567,7 @@ if (specs.statusSub===true) {
     adminLog.start = `${clientQuery4Admin.startTime} / ${today}`
     adminLog.time = clientQuery4Admin.finalTime
     adminLog.due = clientQuery4Admin.due
+    adminLog.kickOutStatus=false
     adminLog.timestamp = Date.now()
     
   
@@ -575,24 +576,52 @@ if (specs.statusSub===true) {
       activityHistory:adminLog
   }
   });
+  //////////////////////LOGS per Admin//////////////////////
+  /////////////////////Logs history per Client////////////////////
+  let clientLog={}
+  clientLog.admin=`${adminDetails.email}`
+  clientLog.totalTime=clientQuery4Admin.finalTime
+  clientLog.kids=afterClientEnd.kids
+  clientLog.adults=afterClientEnd.adults
+  clientLog.due=clientQuery4Admin.due
+  clientLog.timeIn=`${clientQuery4Admin.startTime} / ${today}`
+  clientLog.dateLog = Date.now()
 
-
+  const clientLogHistory=await Client.findOneAndUpdate({_id:req.params.id},{
+      $addToSet: {
+        sessionHistory:clientLog
+    }
+    });
+  console.log(req.params.id);
+  console.log(clientLog);
 
 
 
 });
 
 
-///RESET AND CLIENTS TIME FOR SPECIFIC CLIENT
+///RESET Time and write in log the reset (Kick Out in client side) CLIENTS TIME FOR SPECIFIC CLIENT
 exports.reset = catchAsync(async (req, res, next) => {
+
+  const errorCheck = await Client.findById(req.params.id)
+  if (errorCheck.timeIn>0) {
+    console.log('time has started');
+  } else {
+    console.log('time has Not started');
+  }
+  
+
+
+  let fireBaseIdFrontend=req.params.fireBaseId
+  const adminDetails = await Admin.findOne({fireBaseId:fireBaseIdFrontend})
 
   let prodsBackEnd = {}
   prodsBackEnd.productName = '';
   prodsBackEnd.price = '';
   prodsBackEnd.qty = '';
   prodsBackEnd.total = '';
-  // // console.log(prodsBackEnd);
-  // // console.log(req.params.id);
+  
+  
   
   const clientP = await Client.updateOne({_id:req.params.id},{
     $unset: {
@@ -601,9 +630,115 @@ exports.reset = catchAsync(async (req, res, next) => {
   });
 
 
+    
+
+    ////////////////////////LOGS for admin side
+    const clientQuery4Admin = await Client.findById(req.params.id)
+    let today = new Date();
+    let dd = String(today.getDate()).padStart(2, '0');
+    let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    let yyyy = today.getFullYear();
+    today = mm + '/' + dd + '/' + yyyy;
+    let calTimeAfterReset = (((Date.now()-clientQuery4Admin.timeIn)/1000)/60).toFixed(0)
+    let dueFromClientSide = req.body.kickOutDueFromClientSide
+    let adminLog = {}
+    adminLog.adminEmailName = `${adminDetails.email}`
+    adminLog.adminFireBaseId = fireBaseIdFrontend
+    adminLog.clientName = `${clientQuery4Admin.name} / k: ${clientQuery4Admin.kids} | a: ${clientQuery4Admin.adults} | t: ${calTimeAfterReset}/min | $: ${dueFromClientSide} lei`
+    adminLog.start = `${clientQuery4Admin.startTime} / ${today}`
+    adminLog.kickOutStatus=true
+    adminLog.clientTimeIn=clientQuery4Admin.timeIn
+    adminLog.time = clientQuery4Admin.finalTime
+    adminLog.due = clientQuery4Admin.due
+    adminLog.timestamp = Date.now()
+    
+  
+  const admin = await Admin.findOneAndUpdate({fireBaseId:fireBaseIdFrontend},{
+    $addToSet: {
+      activityHistory:adminLog
+  }
+  });
+  ////////////////////////LOGS for admin side
+  let clientLog={}
+  clientLog.admin=`${adminDetails.email}`
+  clientLog.totalTime=calTimeAfterReset
+  clientLog.kids=clientQuery4Admin.kids
+  clientLog.adults=clientQuery4Admin.adults
+  clientLog.due=dueFromClientSide
+  clientLog.kickedOF=true
+  clientLog.timeIn=`${clientQuery4Admin.startTime} / ${today}`
+  clientLog.dateLog = Date.now()
+
+
+  const clientLogHistory=await Client.findOneAndUpdate({_id:req.params.id},{
+    $addToSet: {
+      sessionHistory:clientLog
+  }
+  });
+
+
+/////////////////////////////////////////////////
+
+  let reset={}
+  reset.timeIn=0
+  reset.timeOut=0
+  reset.adults=0
+  reset.kids=0
+  reset.finalTime=0
+  reset.paused=0
+  reset.resume=0
+  reset.totalPaused=0
+  reset.elapsedOnPaused=0
+  reset.pausedStatus=0
+  reset.totalPausedRAM=0
+  reset.payed=0
+  reset.noOfpeopleClimbing=0
+  reset.status = false;
+  reset.startTime = 0;
+  reset.due = 0
+  
+  
+  
+  const client = await Client.findByIdAndUpdate(req.params.id, reset, {
+    new: true,
+    runValidators: true
+  });
+
+  if (!client) {
+    return next(new AppError("No client found with that ID", 404));
+  }
+  
+  res.status(200).json({
+    status: "success",
+    data: { client }
+  });
 
 
 
+
+});
+
+
+
+
+exports.resetAfterEndTime = catchAsync(async (req, res, next) => {
+
+
+  
+
+  let prodsBackEnd = {}
+  prodsBackEnd.productName = '';
+  prodsBackEnd.price = '';
+  prodsBackEnd.qty = '';
+  prodsBackEnd.total = '';
+  
+  
+  
+  const clientP = await Client.updateOne({_id:req.params.id},{
+    $unset: {
+      prodHistory:prodsBackEnd
+  }
+  });
 
 
   let reset={}
@@ -641,22 +776,12 @@ exports.reset = catchAsync(async (req, res, next) => {
   });
 });
 
-/////SEARCH LOGIC
 
-// exports.searchClient = catchAsync(async (req, res, next) => {
-//   let search = req.query.search
-  
-//   const client = await Client.findOne({ name: 'Croatia' })
 
-//   // if (!client) {
-//   //   return next(new AppError("No client found with that ID", 404));
-//   // }
-  
-//   // res.status(200).json({
-    
-//   //   client
-//   // });
-// });
+
+
+
+
 
 
 

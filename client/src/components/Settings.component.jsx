@@ -5,8 +5,8 @@ import EditGymPrice from './EditGymPrice.component'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Container from 'react-bootstrap/Container'
-import Button from 'react-bootstrap/esm/Button';
-import Card from 'react-bootstrap/esm/Card';
+import Button from 'react-bootstrap/Button';
+import Card from 'react-bootstrap/Card';
 import { RiChatDeleteLine } from "react-icons/ri";
 // import {Link} from 'react-router-dom';
 

@@ -1,7 +1,7 @@
 import React, {Component,useEffect,useState} from 'react';
-import Button from 'react-bootstrap/Button';
+import Button from 'react-bootstrap/Button'
 import Spinner from 'react-bootstrap/Spinner'
-import { FaPause, FaPlay, FaStop, FaUndo } from 'react-icons/fa';
+import { FaPause, FaPlay } from 'react-icons/fa';
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 function PauseButton(props){
 

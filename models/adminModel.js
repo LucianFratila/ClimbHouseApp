@@ -13,6 +13,10 @@ let adminSchema = new mongoose.Schema({
     name:{
         type:String
     },
+    role:{
+        type:String,
+        default:'normal'
+    },
     activityHistory:[{
         adminEmailName:{
             type:String
@@ -33,6 +37,18 @@ let adminSchema = new mongoose.Schema({
             type:Number
         },
         timestamp:{
+            type:Number
+        },
+        clientTimeIn:{
+            type:Number
+        },/////////for kickout ref
+        kickOutStatus:{
+            type:Boolean
+        },
+        kickOutTimeOnEnd:{
+            type:String
+        },
+        kickOutDueFromClientSide:{
             type:Number
         }
         

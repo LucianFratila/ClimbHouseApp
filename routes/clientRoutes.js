@@ -52,8 +52,12 @@ router
 .post(clientController.timeIN)//start time for client by id
 
 router
-.route("/reset/:id")
+.route("/reset/:id/:fireBaseId")
 .post(clientController.reset)//reset time for client by id
+
+router
+.route("/dismiss/:id")
+.post(clientController.resetAfterEndTime)//reset time after end for client by id
 
 router
 .route("/end/:id/:fireBaseId")

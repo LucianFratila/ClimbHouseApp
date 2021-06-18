@@ -1,8 +1,7 @@
 import React, {Component,useEffect,useState} from 'react';
-import Button from 'react-bootstrap/Button';
+import Button from 'react-bootstrap/Button'
 import Spinner from 'react-bootstrap/Spinner'
-import { confirmAlert } from 'react-confirm-alert'; // Import
-import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+
 import { RiChatDeleteLine } from "react-icons/ri";
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 function DeleteProdsHistory(props){

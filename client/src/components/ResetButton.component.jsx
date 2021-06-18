@@ -1,76 +1,101 @@
-import React, {Component,useEffect,useState} from 'react';
-import Button from 'react-bootstrap/Button';
+import axios from 'axios';
+import React, {useState,useContext} from 'react';
+import Button from 'react-bootstrap/Button'
 import Spinner from 'react-bootstrap/Spinner'
-import { confirmAlert } from 'react-confirm-alert'; // Import
-import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-import { FaExclamationTriangle, FaPlay, FaStop, FaUndo } from 'react-icons/fa';
+
+import { FaExclamationTriangle} from 'react-icons/fa';
+
+import { AuthContext } from "../Auth"
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 function ResetButton(props){
 
-
+  const {currentUser} = useContext(AuthContext)
+  const [isLoading, setLoading] = useState(false);
+  
+  // console.log(currentUser.uid);
 const resetTime =async ()=>{
 
 
-const url = `${SERVER_URL}/clients/reset/`+ props.ClientId;
-const res = await fetch(url,{
-    method: 'POST',
-})
+
+
+const url = `${SERVER_URL}/clients/reset/${props.ClientId}/${currentUser.uid}`;
+
+
+if (confirm(`Kick Out ${props.name}?`)) {
+  try {
+  
+    setLoading(true)
+    await axios(url,{
+      method: 'POST',
+      data:{
+        kickOutDueFromClientSide: props.dueFromClientSide
+    }
+  })
+  } catch (error) {
+    alert(error)
+  }
+  setLoading(false)
+} else {
+  // Do nothing!
+  
+}
+
+
+props.refresh()
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 
 
 }
-  const [isLoading, setLoading] = useState(false);
+  
   
     
   
-useEffect(() => {
-  if (isLoading) {
-    resetTime().then(() => {
-      setLoading(false);
-    });
-  }
-}, [isLoading]);
 
-
-
-
-const handleClick = () => {
-  confirmAlert({
-    title: '!!! Kicking Out !!!',
-    message:`${props.name} > ${props.due.toString()}/lei @ ${props.time.toString()}/min`,
-    buttons: [
-      {
-        label: 'Yes',
-        onClick: () => {
-          props.refresh()
-          setLoading(true)
-        }
-      },
-      {
-        label: 'No',
-        onClick: () => props.refresh()
-      }
-    ]
-  })
-    
-};
-
-;
 
 return(
-    <Button
+
+    <>
+   
+
+
+    {
+      props.in===0 || props.paused===true || props.out>0
+      ?
+      <Button
+      variant="warning"
+      size='1.2em'
+      disabled={true}
+      
+      >
+        <span>
+        <FaExclamationTriangle size='25px'/> <span>Kick Out: n/a</span>
+      </span>
+      </Button>
+      :
+      <Button
     variant="warning"
     size='1.2em'
     disabled={isLoading}
-    onClick={
-      !isLoading ? handleClick : null
-      
-    }
+    onClick={!isLoading ? resetTime: null}
     >
     
-    {isLoading ?
+    {
+    isLoading ?
       <span>
       <Spinner
       as="span"
@@ -82,8 +107,14 @@ return(
       
       </span>
       
-    : <span><FaExclamationTriangle size='25px'/> <span>Kick Out</span></span>}
+    : 
+      <span>
+        <FaExclamationTriangle size='25px'/> <span>Kick Out</span>
+      </span>
+    }
     </Button>
+    }
+    </>
 )
 }
 

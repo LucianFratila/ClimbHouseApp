@@ -1,7 +1,6 @@
 import React, { useCallback, useContext,useState } from "react";
-import { withRouter, Redirect } from "react-router";
+import { withRouter } from "react-router";
 import app from "../base";
-import { AuthContext } from "../Auth";
 import Container from 'react-bootstrap/Container'
 import ResetPass from './ResetPass.component'
 import Row from 'react-bootstrap/Row'
@@ -11,14 +10,13 @@ import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import Image from 'react-bootstrap/Image'
 import logo from "../Logo-Climb-House-scris-white.png";
-import { BiLogInCircle } from "react-icons/bi"
-import { confirmAlert } from 'react-confirm-alert'; // Import
-import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import { AuthContext } from "../Auth";
 
 
 const LoginAdmin = ({ history }) => {
   const [show,setShow]=useState(false)
-
+  const {superUser} = useContext(AuthContext)
+  // console.log(superUser);
   const showReset = (e)=>{
     e.preventDefault()
     if (show==false) {
@@ -37,7 +35,13 @@ const LoginAdmin = ({ history }) => {
         await app
           .auth()
           .signInWithEmailAndPassword(email.value, password.value);
-        history.push("/");
+          // if (superUser.roles==='super') {
+          //   history.push("/cs");
+          // } 
+          // if (superUser.roles==='normal') {
+          //   history.push("/");
+          // } 
+          history.push("/active");
       } catch (error) {
 
         confirmAlert({
@@ -60,11 +64,14 @@ const LoginAdmin = ({ history }) => {
     [history]
   );
 
-  const { currentUser } = useContext(AuthContext);
+  // if (superUser!==null) {
+  //   console.log(superUser.roles);
+  //   if (superUser.roles==='super') {
+  //   return <Redirect to="/cs" />;
+  // }
+  // }
 
-  if (currentUser) {
-    return <Redirect to="/" />;
-  }
+  
 
   return (
 

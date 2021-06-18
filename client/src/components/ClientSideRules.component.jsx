@@ -1,24 +1,15 @@
 
-import React, {useEffect,useState,useRef} from 'react';
-import axios from 'axios';
+import React, {useState} from 'react';
+
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
-import ButtonGroup from 'react-bootstrap/ButtonGroup'
-import Card from 'react-bootstrap/Card'
-import ProductsSelectForm from './ProductsSelectForm.component'
-import SubscriptionButton from './SubscriptionButton.component'
-import DeleteProdsHistory from './DeleteProdsHistory.component'
-import { FaEnvelope, FaUserCircle,FaUsers,FaCartPlus,FaCalendarCheck, FaTimesCircle, FaTimes, FaClock, FaTools } from 'react-icons/fa';
-import { IoMdWalk,IoMdTimer } from "react-icons/io";
-import StopButton from './StopButton.component'
-import ResetButton from './ResetButton.component'
 import Image from 'react-bootstrap/Image'
 import logo from "../Logo-Climb-House-scris-white.png";
 import CreateClient from './CreateClient.component'
-import ReCAPTCHA from 'react-google-recaptcha'
 
-import Button from 'react-bootstrap/Button';
+
+
 
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
@@ -63,16 +54,18 @@ function ClientSideRules(props) {
             <li style={{fontWeight: 400}}><span style={{fontWeight: 400}}>lucram cu cele mai sigure echipamente de autoasigurare din lume</span></li>
             <li style={{fontWeight: 400}}><span style={{fontWeight: 400}}>sistemele de autoasigurare sunt asigurate&nbsp;în 2 puncte&nbsp;</span></li>
             <li style={{fontWeight: 400}}><span style={{fontWeight: 400}}>carabiniera de prindere este 3 lock adică necesită 3 pasi pt&nbsp;deblocare evitându-se astfel complet deblocările accidentale</span></li>
+            <li><strong><span style={{fontWeight: 400}}>accesorioile de escaladă sunt certificate UIAA&nbsp;(</span><strong>International Climbing and Mountaineering Federation)</strong></strong></li>
+            <li style={{fontWeight: 400}}><span style={{fontWeight: 400}}>podeaua spațiului&nbsp;este în 2 culori, delimitându-se astfel zonele de trecere și zonele care trebuie evitate când sunt cățărători pe traseu</span></li>
+            <li style={{fontWeight: 400}}><span style={{fontWeight: 400}}>fiecare traseu este prevăzut cu un sistem de blocare, astfel încât cățărătorii nu pot pleca pe traseu până nu se asigură.</span></li>
           </ul>
         </ul>
         
         <ul>
-          <li><strong><span style={{fontWeight: 400}}>accesorioile de escaladă sunt certificate UIAA&nbsp;(</span><strong>International Climbing and Mountaineering Federation)</strong></strong></li>
+          
         </ul>
         
         <ul>
-          <li style={{fontWeight: 400}}><span style={{fontWeight: 400}}>podeaua spațiului&nbsp;este în 2 culori, delimitându-se astfel zonele de trecere și zonele care trebuie evitate când sunt cățărători pe traseu</span></li>
-          <li style={{fontWeight: 400}}><span style={{fontWeight: 400}}>fiecare traseu este prevăzut cu un sistem de blocare, astfel încât cățărătorii nu pot pleca pe traseu până nu se asigură.</span></li>
+         
         </ul>
         
         <p><span style={{fontWeight: 400}}>&nbsp;Traseele noastre de cățărat sunt accesibile tuturor persoanelor începand cu varsta de 4-5 ani, care au peste 15 kg și o stare de sanatate fizică si psihică bună.</span></p>
@@ -97,7 +90,8 @@ function ClientSideRules(props) {
           <li style={{fontWeight: 400}}><span style={{fontWeight: 400}}>În situaţia în care, dupa ce a început sesiunea de cățărat, participantul consideră că nu mai poate participa la activităţile sportive, suma achitată nu se returnează.</span></li>
           <li style={{fontWeight: 400}}><span style={{fontWeight: 400}}>Toti participanții trebuie să contribuie prin actiunile si atitudinea lor la siguranța și buna desfășurare a activității. Accidentarea unui cațărător de către un altul este responsabilitatea directă a celor implicati, instructorul/societatea fiind exonerat(a) de orice răspundere.</span></li>
         </ol>
-        <p><span style={{fontWeight: 800}}>Am citit și înțeles Regulamentul. Sunteți de accord cu el?</span></p>
+        <h4><span style={{fontWeight: 800}}>Am citit și înțeles Regulamentul.</span></h4>
+        <h3><span style={{fontWeight: 800}}>Completarea formularului de mai jos presupune ca sunteți de acord cu regulamentul prezent.</span></h3>
         
         
       </div>
@@ -110,14 +104,14 @@ function ClientSideRules(props) {
     </Col>
     
   </Row>
-  <Row hidden={!agree} style={{padding:'10px'}}>
-    <CreateClient refresh={refresh} style={{marginLeft:'5px'}}/>
+  <Row style={{padding:'10px',width:'100%'}}>
+    <CreateClient refresh={refresh}/>
   </Row>
-  <hr></hr>
+  {/* <hr></hr>
   <span >
   <Button variant="success" size='1.2em' onClick={()=>{SetAgree(true)}}>SUNT de accord.</Button>
   <Button variant="danger" size='1.2em' onClick={()=>{SetAgree(false)}}>NU sunt de accord.</Button>
-  </span>
+  </span> */}
   
   <hr></hr>
   

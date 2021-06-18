@@ -20,22 +20,29 @@ function AdminLogs(props) {
 
     const deleteAllLogs =async ()=>{
 
-        
-        try {
-        const url = `${SERVER_URL}/admins/delete/alllogs`;
-        setLoading(true)
-        const response = await axios({
-            method: 'POST',
-            url: url,
+        if (confirm(`Warning: Delete all logs?`)) {
+            try {
+                setLoading(true)
+                const url = `${SERVER_URL}/admins/delete/alllogs`;
+                
+                const response = await axios({
+                    method: 'POST',
+                    url: url,
+                    
+                    
+                  })
+                  } catch (err) {
+                    console.log(err);
+                    
+                  }
             
+          } else {
             
-          })
-          } catch (err) {
-            console.log(err);
             
           }
         
-        setLoading(false)
+          setLoading(false)
+        
          
         
     }
@@ -62,6 +69,7 @@ function AdminLogs(props) {
                 }
               }
               fetchData()
+              
         }
         
         return ()=> mounted = false
@@ -80,10 +88,10 @@ function AdminLogs(props) {
                
                 <Container >
                 
-                    <Row xl={1} lg={1} md={1} sm={1} xs={1} style={{backgroundColor:'#404040'}} >
+                    <Row xl={1} lg={1} md={1} sm={1} xs={1}  >
                         <Col>
                         <h5>Logs / All Time : {`${allTimeTotals} lei`} </h5>
-                        {/* <Button variant='danger' onClick={onSubmitDeleteAllLogs}>
+                        <Button variant='danger' onClick={onSubmitDeleteAllLogs}>
                             {
                             isLoading===true
                             ?
@@ -92,7 +100,7 @@ function AdminLogs(props) {
                             `Delete all Logs`
                             }
                             
-                        </Button> */}
+                        </Button>
                         </Col>
                         <Col>{
                             log.length===0
@@ -104,13 +112,29 @@ function AdminLogs(props) {
                         
                         {
                                 log.sort((a,b)=>a.timestamp<b.timestamp? 1 : -1).map((item) => (
+                                    <span key={item._id}>
+                                        {
+
+                                            item.kickOutStatus===true
+                                            ?
+                                            <ListGroup variant="flush"  as="ul">
+                                            <ListGroup.Item  style={{color:'red'}} as="li">
+                                                <span style={{fontSize:'12px'}}><b>Kicked Out</b> | <b>{item.start}</b> - Admin: {item.adminEmailName} - Client: {item.clientName}</span>
+                                            </ListGroup.Item>
+                                            
+                                            </ListGroup>
+                                            :
+                                            <ListGroup variant="flush"  as="ul">
+                                            <ListGroup.Item  style={{color:'white', backgroundColor:'black'}} as="li">
+                                                <span style={{fontSize:'12px'}}><b>{item.start}</b> - Admin: {item.adminEmailName} - Client: {item.clientName} - Time: <b>{item.time} min @ {item.due} lei </b></span>
+                                            </ListGroup.Item>
+                                            
+                                            </ListGroup>
+
+                                        }
+                                    </span>
                                     
-                                    <ListGroup key={item._id} as="ul">
-                                        <ListGroup.Item variant="dark" style={{color:'black'}} as="li">
-                                            <span style={{fontSize:'12px'}}><b>{item.start}</b> - Admin: {item.adminEmailName} - Client: {item.clientName} - Time: <b>{item.time} min @ {item.due} lei </b></span>
-                                        </ListGroup.Item>
-                                        
-                                    </ListGroup>
+                                    
                                     
                                     ))
                                     

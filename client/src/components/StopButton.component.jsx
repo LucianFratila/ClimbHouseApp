@@ -1,29 +1,16 @@
-import React, {Component,useEffect,useState} from 'react';
-import Button from 'react-bootstrap/Button';
+import React, {useState,useContext} from 'react';
+import Button from 'react-bootstrap/Button'
 import Spinner from 'react-bootstrap/Spinner'
-import { FaPlay, FaStop } from 'react-icons/fa';
-import { confirmAlert } from 'react-confirm-alert'; // Import
-import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-import app from "../base";
+import {  FaStop } from 'react-icons/fa';
+
+
+import { AuthContext } from "../Auth"
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
-function StartButton(props){
+function StopButton(props){
 
-  const [firebaseID,setFirebaseID] = useState()
-  app.auth().onAuthStateChanged((user) => {
-    if (user) {
-      // User is signed in, see docs for a list of available properties
-      // https://firebase.google.com/docs/reference/js/firebase.User
-      var uid = user.uid;
-      // console.log(uid);
-      setFirebaseID(uid)
-      // ...
-    } else {
-      // User is signed out
-      // ...
-    }
-  });
-
-
+  const {superUser} = useContext(AuthContext)
+  const [isLoading, setLoading] = useState(false);
+ 
 
   let disabledButton
     if (props.paused === true) {
@@ -35,47 +22,29 @@ function StartButton(props){
   const stopTime =async ()=>{
 
 
-    const url = `${SERVER_URL}/clients/end/${props.ClientId}/${firebaseID}` ;
-    const res = await fetch(url,{
-        method: 'POST',
-        
-    })
+    const url = `${SERVER_URL}/clients/end/${props.ClientId}/`+superUser.uid ;
+    if (confirm(`Stop Time for ${props.name}?`)) {
+      try {
+      
+        setLoading(true)
+        const res = await fetch(url,{
+          method: 'POST',
+          
+      })
+      } catch (error) {
+        alert(error)
+      }
+      
+    } else {
+      setLoading(false)
+      
+    }
+
+    
+    props.refresh()
 
 }
-      const [isLoading, setLoading] = useState(false);
-      
-        
-      
-    useEffect(() => {
-      if (isLoading) {
-        stopTime().then(() => {
-          setLoading(false);
-        });
-      }
-    }, [isLoading]);
-   
-    const handleClick = () => {
-      confirmAlert({
-        title: 'Confirm action !',
-        message: `Stop time for:  ${props.name} ?`,
-        buttons: [
-          {
-            label: 'Yes',
-            onClick: () => {
-              props.refresh()
-              setLoading(true)
-            }
-          },
-          {
-            label: 'No',
-            onClick: () => props.refresh()
-          }
-        ]
-      })
-        
-    };
 
-;
 
     return(
         <>
@@ -96,7 +65,7 @@ function StartButton(props){
                     size='1.2em'
                     disabled={isLoading,disabledButton}
                     onClick={
-                    !isLoading ? handleClick : null
+                    !isLoading ? stopTime : null
                     
                     }
                     >
@@ -126,4 +95,4 @@ function StartButton(props){
 
 
 
-export default StartButton
+export default StopButton

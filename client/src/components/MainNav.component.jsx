@@ -1,58 +1,48 @@
 
 import "bootstrap/dist/css/bootstrap.min.css";
-import {BrowserRouter as Router, NavLink, Route} from "react-router-dom";
-import '../index.css'
-import ClientList from "../components/ClientList.component";
-import ActiveClientList from "../components/ActiveClientList.component";
-import GymPriceDisplay from "../components/GymPriceDisplay.component";
-import EditClient from "../components/EditClient.component";
-import Settings from "../components/Settings.component";
+
+
 
 
 import logo from "../Logo-Climb-House-scris-white.png";
 import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
 import NavDropdown from 'react-bootstrap/NavDropdown'
-import Container from 'react-bootstrap/Container'
-import React, { useEffect, useState } from 'react';
-import FormControl from "react-bootstrap/esm/FormControl";
-import Form from "react-bootstrap/esm/Form";
-import Button from "react-bootstrap/esm/Button";
-import axios from 'axios';
-
-import LoginAdmin from "../components/LoginAdmin.component";
-import SignupAdmin from "../components/SignupAdmin.compnent";
+import React, { useContext } from 'react';
+import { AuthContext } from "../Auth"
+import Button from "react-bootstrap/Button";
 import app from "../base";
-import { AuthProvider } from "../Auth";
-import PrivateRoute from "../PrivateRoute";
-import { AuthContext } from "../Auth";
-import { BiLogInCircle, BiUser } from "react-icons/bi"
+
+
+import { BiLogInCircle, BiUser,BiRocket } from "react-icons/bi"
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
-function MainNav(props) {
-
-  const [firebaseID,setFirebaseID] = useState()
-  app.auth().onAuthStateChanged((user) => {
-    if (user) {
-      // User is signed in, see docs for a list of available properties
-      // https://firebase.google.com/docs/reference/js/firebase.User
-      var uid = user.uid;
-      // console.log(uid);
-      setFirebaseID(uid)
-      // ...
-    } else {
-      // User is signed out
-      // ...
-    }
-  });
+function MainNav({ history }) {
   
+  const {currentUser} = useContext(AuthContext)
+  const {superUser} = useContext(AuthContext)
+  // console.log(superUser.roles);
+const logout = ()=>{
+  app.auth().signOut()
+  refreshLogout()
+  
+  
+}
+
+const refreshLogout=()=>{
+  location.reload()
+  
+  
+}
   
   return (
-    
-    <AuthContext.Consumer>
-      {(context) =>
+
       
-      <Navbar bg="dark" variant="dark" expand="lg">
+      
+      <Navbar
+       bg={superUser.roles!=='super'?"secondary":'dark'} 
+       variant="dark" 
+       expand="lg">
       {/* <Navbar.Brand href="#home">ClimbHouse</Navbar.Brand> */}
       
       
@@ -76,19 +66,52 @@ function MainNav(props) {
         <Nav className="mr-auto">
           {/* <Nav.Link href="#home">Home</Nav.Link>
           <Nav.Link href="#link">Link</Nav.Link> */}
-          <Nav.Item>
-            <Nav.Link href="/">All Clients</Nav.Link>
-          </Nav.Item>
+          
+          {
+            superUser.roles==='normal'
+            ?
+            <Nav.Item>
+              <Nav.Link href="/">All Clients</Nav.Link>
+            </Nav.Item>
+            :
+            null
+          }
+          {
+            superUser.roles==='super'
+            ?
+            <Nav.Item>
+              <Nav.Link href="/cs">All Clients</Nav.Link>
+            </Nav.Item>
+            :
+            null
+          }
+          
           
           <Nav.Item>
             <Nav.Link href="/active">Active Clients</Nav.Link>
           </Nav.Item>
+          {
+            superUser.roles==='normal'
+            ?
+            <NavDropdown title="Settings" id="basic-nav-dropdown">
+              <NavDropdown.Item href="/settings">Tarifs and Products</NavDropdown.Item>
+              
+            </NavDropdown>
+            :
+            null
+          }
+          {
+            superUser.roles==='super'
+            ?
+            <NavDropdown title="Settings" id="basic-nav-dropdown">
+              <NavDropdown.Item href="/settings">Tarifs and Products</NavDropdown.Item>
+              <NavDropdown.Item href="/signup">Register admin</NavDropdown.Item>
+              <NavDropdown.Item href="/logs">Logs</NavDropdown.Item>
+            </NavDropdown>
+            :
+            null
+          }
           
-          <NavDropdown title="Settings" id="basic-nav-dropdown">
-            <NavDropdown.Item href="/settings">Tarifs and Products</NavDropdown.Item>
-            <NavDropdown.Item href="/signup">Register admin</NavDropdown.Item>
-            <NavDropdown.Item href="/logs">Logs</NavDropdown.Item>
-          </NavDropdown>
           
           
           
@@ -98,8 +121,8 @@ function MainNav(props) {
         </Nav>
         <Navbar.Text >
           <div style={{ justifyContent:'space-between'}}>
-          <span><BiUser/> <a href={`/admins/${firebaseID}`}>{context.currentUser.email}</a> </span>
-          <Button size="sm" variant="outline-info" onClick={()=>app.auth().signOut()}><BiLogInCircle/></Button>
+          <span>{superUser.roles!=='super'?<BiUser/>:<BiRocket/>} <a href={`/admins/${currentUser.email}`}>{currentUser.email}</a> </span>
+          <Button size="sm" variant="outline-info" onClick={logout}><BiLogInCircle/></Button>
           
           </div>
          
@@ -110,11 +133,6 @@ function MainNav(props) {
     </Navbar>
 
 
-
-      
-      }
-    </AuthContext.Consumer>
-      
       
     
    

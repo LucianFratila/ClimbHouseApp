@@ -1,11 +1,11 @@
 import React, {Component,useEffect,useState} from 'react';
 import Form from 'react-bootstrap/Form';
-import Col from 'react-bootstrap/Col';
-import Alert from 'react-bootstrap/Alert';
-import Button from 'react-bootstrap/Button';
+// import Col from 'react-bootstraps/Col';
+// import Alert from 'react-bootstrap/Alert';
+import Button from 'react-bootstrap/Button'
 import axios from 'axios';
 import Spinner from 'react-bootstrap/Spinner'
-import { FaPlay } from 'react-icons/fa';
+
 
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 function ProductsSelectForm(props){
@@ -77,10 +77,10 @@ function ProductsSelectForm(props){
 
     return(
         <span>
-            {
+            {/* {
             show 
             ?
-            <Alert style={{zIndex:'1',position:'relative'}} variant="danger" onClose={() => setShow(false)} dismissible>
+            <span style={{zIndex:'1',position:'relative'}} variant="danger" onClose={() => setShow(false)} >
             <Alert.Heading>Some error ! </Alert.Heading>
             <p>
             Please select a product.
@@ -88,9 +88,9 @@ function ProductsSelectForm(props){
             </Alert>
             :
             null
-        }
+        } */}
         <Form onSubmit={onSubmit}  inline>
-            <Form.Group style={{display:'flex', padding: '10px '}}  as={Col} >
+            <Form.Group style={{display:'flex', padding: '10px '}}   >
            
             <Form.Control required onChange={handleChangeSelect} style={{backgroundColor:'black',color:'white'}} as="select" size="lg" custom>
             {props.products.map((option) => (

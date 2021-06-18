@@ -8,25 +8,26 @@
     "@testing-library/user-event": "^12.6.3",
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
+    "create-react-class": "^15.7.0",
     "firebase": "^8.2.9",
-    "react": "^17.0.1",
-    "react-bootstrap": "^1.4.3",
-    "react-confirm-alert": "^2.7.0",
-    "react-dom": "^17.0.1",
+    "firebase-admin": "^9.9.0",
+    "jquery": "^3.6.0",
+    "popper.js": "^1.16.1",
+    "react": "^17.0.2",
+    "react-bootstrap": "^1.6.1",
+    "react-dom": "^17.0.2",
     "react-google-recaptcha": "^2.1.0",
     "react-icons": "^4.2.0",
-    "react-private-public-route": "^1.1.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.2",
     "web-vitals": "^1.1.0"
   },
-  "proxy":"http://localhost:5000",
+  "proxy": "http://localhost:5000",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
-
   },
   "eslintConfig": {
     "extends": [

@@ -4,6 +4,7 @@ import axios from 'axios';
 import StopButton from './StopButton.component'
 import StartButton from './StartButton.component'
 import ResetButton from './ResetButton.component'
+import ResetAfterEndButton from './ResetAfterEndButton.component';
 import InsertClimbers from './InsertClimbers.component'
 import PauseButton from './PauseButton.component'
 import Row from 'react-bootstrap/Row'
@@ -17,10 +18,11 @@ import Card from 'react-bootstrap/Card'
 import Container from 'react-bootstrap/Container'
 import CardGroup from 'react-bootstrap/CardGroup'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
-import Button from 'react-bootstrap/esm/Button';
-import Spinner from 'react-bootstrap/esm/Spinner';
-import ListGroup from 'react-bootstrap/esm/ListGroup';
-import { FaArrowCircleDown, FaArrowCircleUp } from 'react-icons/fa';
+import Button from 'react-bootstrap/Button';
+import Spinner from 'react-bootstrap/Spinner';
+import ListGroup from 'react-bootstrap/ListGroup';
+import { FaArrowRight, FaDotCircle } from 'react-icons/fa';
+
 
 
 
@@ -30,13 +32,148 @@ import { FaArrowCircleDown, FaArrowCircleUp } from 'react-icons/fa';
 
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
+function LastCreatedModal(props) {
+
+    const [isLoading,setIsLoading]=useState(false)
+    const [data,setData]=useState([])
+    const [clientId,setClientId]=useState()
+    const[limit,setLimit] = useState(3);
+    const[sort,setSort]=useState('desc')
+    
+    
+    
+    
+    
+    function getFetchUrl() {
+        return `${SERVER_URL}/clients/`;
+      }
+
+
+      useEffect(()=>{
+            
+        setIsLoading(true)
+        axios.get(getFetchUrl(),{
+            params: {
+              limit,
+              sort
+            }
+          }).then(
+            res=>{
+                setData(res.data.clients);
+                setIsLoading(false)
+                
+            }
+            
+        ).catch(err=>
+            {
+                alert(err)
+            
+            }
+            )
+            
+    },[])
+
+    useEffect(()=>{
+            
+        
+        axios.get(getFetchUrl(),{
+            params: {
+              limit,
+              sort
+            }
+          }).then(
+            res=>{
+                setData(res.data.clients);
+                
+                
+            }
+            
+        ).catch(err=>
+            {
+                alert(err)
+            
+            }
+            )
+        
+    },[limit])
+    
+    
+    return (
+      <Modal
+        
+        show={true}
+        onHide={props.handleClose}
+        size="xl"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+      >
+        <Modal.Header >
+          <Modal.Title id="contained-modal-title-vcenter">
+           {isLoading?'Loading...':
+           <span>
+               <Form inline >
+
+               <h2>Last Created</h2>
+               <FaArrowRight size='15px'/> <FormControl  className="inlineFormInputGroupUsername2" type="number" style={{width:'80px'}}  min="1" value={limit}  onChange={(e)=>{e.preventDefault;setLimit(e.target.value)}} />
+               </Form>
+                  
+            </span>
+           }
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body >
+        <Container>
+        <Row>
+            
+            {isLoading
+            ?
+            <Spinner animation="border" />
+            :
+            <Col sm='auto'>
+            <div className="scrollableContent">
+                 
+                {
+                    
+                    data.sort((a,b)=>a.timeStamp<b.timeStamp? 1 : -1).map(item=>(
+                        
+                        <ListGroup key={item._id} variant="flush">
+                        
+                        <ListGroup.Item  action onClick={()=>setClientId(item._id)} ><span style={{fontSize:'14px'}}>{item.date.toString().substr(0, 10)}<FaArrowRight size='10px'/>{item.date.toString().substr(11, 8)}<FaArrowRight size='10px'/>{item.name}</span></ListGroup.Item>
+                        
+                        </ListGroup>
+                        
+                    )
+                        
+                    )
+                }
+                </div>
+                </Col>
+            }  
+                
+            
+            <Col sm='auto'>
+            <span>
+             {clientId!==undefined?<Search4ActiveCard  nos={props.totalInGym} refresh={props.refresh}  id2Search={clientId}/>:null}   
+            
+            </span>
+            
+            </Col>
+            
+        </Row>
+        </Container>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={props.onHide}>Close</Button>
+        </Modal.Footer>
+      </Modal>
+    );
+  }
+
+
+
 
 function MyVerticallyCenteredModal(props) {
     const [id4Start,setId4Start]=useState('')
-    // const [inGym,setInGym]=useState();
-    // console.log(props.totalInGym);
-    // console.log(props.refresh);
-    
     return (
       <Modal
         
@@ -96,6 +233,7 @@ function MyVerticallyCenteredModal(props) {
     const [totalClimbers,setTotalClimbers]=useState(0)
     const[client,setClient] = useState(null);
     const[loading,setLoading]=useState(false);
+    
     const onChangeAdults=(e)=>{
         setAdults(e.target.value)
         }
@@ -202,6 +340,11 @@ function MyVerticallyCenteredModal(props) {
                         :
                         client.timeIn>0?'Time is running':'Time is NOT running'
                         }
+
+                        <span style={{float:'right'}}>
+                            <Link style={{marginRight: "5px"}}  className="btn btn-primary" to={"/edit/"+ id2Search}>Details</Link>
+                            
+                        </span>
                         
                     </Card.Header>
                     <Card.Body>
@@ -289,6 +432,7 @@ function ClientList(){
     const[query,setQuery] = useState('');
     const[modal4SearchResults,setModal4SearchResults]=useState(false);
     const[reverseOrder,setReverseOrder]=useState(false)
+    const[showLastCreated,setShowLastCreated]=useState(false)
     
     
     let totalClimbers = clients.reduce((accumulator, current) => accumulator + current.noOfpeopleClimbing, 0);
@@ -427,6 +571,32 @@ function ClientList(){
    
     return(
     <div>
+
+            <MyVerticallyCenteredModal
+                totalInGym={totalClimbers}
+                show={modal4SearchResults}
+                handleClose={() => {setModal4SearchResults(false);setQuery('')}}
+                onHide={() => {setModal4SearchResults(false);setQuery('')}}
+                clients={searchClients}
+                no={searchClients.length}
+                refresh={refresh}
+            />
+            {
+                showLastCreated===true
+                ?
+                <LastCreatedModal
+                totalInGym={totalClimbers}
+                show={true}
+                handleClose={() => setShowLastCreated(false)}
+                onHide={() => setShowLastCreated(false)}
+                refresh={refresh}
+                />
+                :
+                null
+             
+
+            }
+            
         <Row > 
             <span style={{marginTop:'10px',marginLeft:'15px',marginRight:'15px'}}>
                 <h3>Active Clients </h3>
@@ -439,36 +609,26 @@ function ClientList(){
         <Row style={{marginTop:'10px',marginLeft:'15px',marginRight:'15px'}}>
         <Form  inline >
         
-        {/* <Form.Label className="inlineFormInputGroupUsername2" srOnly>
-            Email
-        </Form.Label> */}
+        
         <InputGroup className="mb-2 mr-sm-2">
-            <InputGroup.Prepend>
-            <InputGroup.Text>Search</InputGroup.Text>
-            </InputGroup.Prepend>
-            <FormControl  className="inlineFormInputGroupUsername2" type="text"  onChange={onChangeSearch} />
-
-            <Button
+            
+            <FormControl style={{width:'200px'}} placeholder='Search'  className="inlineFormInputGroupUsername2" type="text" value={query}  onChange={onChangeSearch} />
+        <ButtonGroup>
+        <Button
                 onClick={() => setModal4SearchResults(true)} 
                 variant={searchClients.length===0?'danger':'success'}
                 disabled={searchClients.length===0?true:false}
             >
-                Results: {searchClients.length} {searchClients.length===0?'':' / Show Results'}
+                Results: {searchClients.length} 
+                
             </Button>
-            {/* <span style={{marginLeft:'20px'}}>
-            Filter by entry time <Button variant='info' onClick={toggleFilterClients}>{reverseOrder===false?<FaArrowCircleUp/>:<FaArrowCircleDown/>}</Button>
-            </span> */}
+            <Button onClick={() => setShowLastCreated(true)} >Last Created</Button>
+        </ButtonGroup>
+            
+            
             
 
-            <MyVerticallyCenteredModal
-                totalInGym={totalClimbers}
-                show={modal4SearchResults}
-                handleClose={() => setModal4SearchResults(false)}
-                onHide={() => setModal4SearchResults(false)}
-                clients={searchClients}
-                no={searchClients.length}
-                refresh={refresh}
-            /> 
+            
 
         </InputGroup>
         
@@ -513,9 +673,9 @@ function ClientList(){
                             <span style={{marginLeft:'3px', fontSize:'25px',}}>{client.name} ~ Paused</span>
                             :
                             <span>
-                                <span style={{marginLeft:'3px', fontSize:'25px',}}>{client.name}</span>
+                                <span style={{marginLeft:'3px', fontSize:'25px',}}>{client.name} </span>
                                 <span style={{fontSize:'15px',color:'white',marginLeft:'10px'}}>
-                                    (Adults:{client.adults}・Kids:{client.kids})
+                                    (Adults:{client.adults}・Kids:{client.kids}) 
                                 </span>
                             </span>
                             
@@ -523,7 +683,7 @@ function ClientList(){
                         
                         
                         <span style={{float:'right'}}>
-                            <Link style={{marginRight: "5px"}}  className="btn btn-primary" to={"/edit/"+ client._id}>Details</Link>
+                            <Link style={{marginRight: "5px"}}  className="btn btn-primary" to={"/edit/"+ client._id}>Details </Link>
                         </span>
                         
                         
@@ -559,16 +719,6 @@ function ClientList(){
                                                 ?
                                                 <span>{ctime(client.totalPaused,calculateMins(Date.now(),client.timeIn))} / min - aprox. {(client.kids*priceKids)+(client.adults*priceAdults)} / lei</span>
                                                 :
-                                                // let a = 0 //nr copii
-                                                // let b = 2 //nr adulti
-                                                // let c = 20 //pret copii
-                                                // let d = 25 //pret adulti
-
-                                                // let y = 179//timp scurs in minute
-
-                                                // let x = (a*c)+(b*d)
-                                                // let z // pret final rotunjit in sus
-                                                // a*(c+(Math.ceil((y-35)/15))*5) + b*(d+(Math.ceil((y-35)/15))*5)
                                                 <span>
                                                     {ctime(client.totalPaused,calculateMins(Date.now(),client.timeIn))} / min - aprox. {
                                                     client.kids*(priceKids+(Math.ceil((ctime(client.totalPaused,calculateMins(Date.now(),client.timeIn))-35)/15))*5)
@@ -610,9 +760,36 @@ function ClientList(){
                                 <StopButton ClientId={client._id} refresh={refresh} timeOut={client.timeOut} status={client.status} name={client.name} paused={client.pausedStatus}/> 
                                     
                                 </ButtonGroup>
-                                <span style={{float:'right'}}>
-                                <ResetButton ClientId={client._id} refresh={refresh} name={client.name} due={client.due} time={client.finalTime}/>
-                                </span>
+                                {
+                                    client.timeOut > 0
+                                    ?
+                                    <span style={{float:'right'}}>
+                                    <ResetAfterEndButton ClientId={client._id} refresh={refresh} />
+                                    </span>
+                                    
+                                    :
+                                    <span style={{float:'right'}}>
+                                    <ResetButton ClientId={client._id} refresh={refresh} in={client.timeIn} out={client.timeOut} paused={client.pausedStatus} name={client.name} due={client.due} time={client.finalTime}
+                                    dueFromClientSide={
+
+                                        ctime(client.totalPaused,calculateMins(Date.now(),client.timeIn))<35
+                                                ?
+                                                (client.kids*priceKids)+(client.adults*priceAdults)
+                                                :   
+                                                client.kids*(priceKids+(Math.ceil((ctime(client.totalPaused,calculateMins(Date.now(),client.timeIn))-35)/15))*5)
+                                                +
+                                                client.adults*(priceAdults+(Math.ceil((ctime(client.totalPaused,calculateMins(Date.now(),client.timeIn))-35)/15))*5)
+                                    }
+
+                                    // timeEndResetClientSide=
+                                    
+                                    
+                                    />
+                                    </span>
+                                    
+
+                                }
+                                
                                 
                                 </span>
                                 

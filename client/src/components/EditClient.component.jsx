@@ -4,18 +4,75 @@ import axios from 'axios';
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
+import Modal from 'react-bootstrap/Modal'
+import Button from 'react-bootstrap/Button'
+import ListGroup from 'react-bootstrap/ListGroup'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import Card from 'react-bootstrap/Card'
 import ProductsSelectForm from './ProductsSelectForm.component'
 import SubscriptionButton from './SubscriptionButton.component'
 import DeleteProdsHistory from './DeleteProdsHistory.component'
-import { FaEnvelope, FaUserCircle,FaUsers,FaCartPlus,FaCalendarCheck, FaTimesCircle, FaTimes, FaClock, FaTools, FaPhone } from 'react-icons/fa';
+import { FaEnvelope, FaUserCircle,FaUsers,FaCartPlus,FaCalendarCheck, FaPlay, FaTimes, FaClock, FaTools, FaPhone, FaDollarSign } from 'react-icons/fa';
 import { IoMdWalk,IoMdTimer } from "react-icons/io";
 import StopButton from './StopButton.component'
 import ResetButton from './ResetButton.component'
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
-
+function MyVerticallyCenteredModal(props) {
+  
+  
+  return (
+    <Modal
+      
+      show={props.show}
+      onHide={props.handleClose}
+      size="xl"
+      aria-labelledby="contained-modal-title-vcenter"
+      centered
+    >
+      <Modal.Header >
+        <Modal.Title id="contained-modal-title-vcenter">
+          <h6>Session History for {props.name} | Results: {props.data.length} | Created at: {props.date.toString().substr(0, 10)}</h6>
+          <p style={{fontSize:'14px'}}><FaTimes color='red' size='12px'/> kicked of | <FaPlay color='green' size='12px'/> Session ok | k: kids / a: adults </p>  
+          
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body >
+      <Container>
+      <Row>
+          <Col sm={12}>
+              <div className="scrollableContent">
+              {
+              props.data.length===0
+              ?
+              <span style={{color:'black'}}>No logs yet!</span>
+              :
+              props.data.sort((a,b)=>a.dateLog<b.dateLog? 1 : -1).map(item=>(
+                      
+                <ListGroup key={item._id} variant="flush">
+                
+                <ListGroup.Item variant='info'  >
+                <span style={{verticalAlign:'middle',display:'inline-block'}}> 
+                {item.kickedOF?<span><FaTimes color='red' size='14px'/></span>:<span><FaPlay color='green' size='14px'/></span>} <b>{item.timeIn}</b> | {item.admin} | <FaClock size='14px'/> {item.totalTime}/min | <FaDollarSign size='14px'/> {item.due}/lei @ k: {item.kids}/a: {item.adults}
+                </span>
+                </ListGroup.Item>
+                
+                </ListGroup> 
+            ))
+              }
+              
+              </div>
+          </Col>
+          
+      </Row>
+      </Container>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button onClick={props.onHide}>Close</Button>
+      </Modal.Footer>
+    </Modal>
+  );
+}
 
 
 function EditClient(props) {
@@ -42,7 +99,10 @@ function EditClient(props) {
     const [timeOut,setTimeOut] = useState(0)
     const [elapsedOnPaused,setElapsedOnPaused] = useState(0)
     const [initialSub,setInitialSub] = useState(0)
-    
+    const [history,setHistory]=useState([])
+    const [showHistory,setShowHistory]=useState(false)
+    const [dateCreated,setDateCreated]=useState('')
+    // console.log(history);
 
 
     const [counter, setCounter] = useState(0);
@@ -117,7 +177,9 @@ function EditClient(props) {
                     return `${SERVER_URL}/clients/` + props.match.params.id;
                   }
                 const result = await axios(getFetchUrl());
-                // console.log(result.data.data.client.pausedStatus);
+                // console.log(result.data.data.client.date);
+                setDateCreated(result.data.data.client.date)
+                setHistory(result.data.data.client.sessionHistory)
                 setAdults(result.data.data.client.adults);
                 setKids(result.data.data.client.kids);
                 setName(result.data.data.client.name);
@@ -188,6 +250,16 @@ function EditClient(props) {
     return(
         
             <div>
+                  <MyVerticallyCenteredModal
+                    name={name}
+                    date={dateCreated}
+                    data={history}
+                    show={showHistory}
+                    handleClose={() => setShowHistory(false)}
+                    onHide={() => setShowHistory(false)}
+                    
+                    
+                />
                
                 <Container >
                     <Row >
@@ -236,7 +308,7 @@ function EditClient(props) {
                         </Col>   
                     </Row>
                     <Row>
-                    <Col  style={{backgroundColor:'#2f2e2e',display: 'flex',alignItems:'center'}}><FaTools size='1.4em'/> <span style={{marginLeft:'5px',fontSize:'20px',padding:'10px'}}>Time/Subscription Control</span></Col>
+                    <Col  style={{backgroundColor:'#2f2e2e',display: 'flex',alignItems:'center'}}><FaTools size='1.4em'/> <span style={{marginLeft:'5px',fontSize:'20px',padding:'10px'}}>Time/Subscription Control</span><Button variant='info' onClick={()=>{setShowHistory(true)}}>History</Button></Col>
                     </Row>
                     <Row>
                     <Col  style={{backgroundColor:'#2f2e2e',alignItems:'center'}}>
@@ -250,7 +322,7 @@ function EditClient(props) {
                           </span>
                           
                           <span style={{float:'right'}}>
-                          <ResetButton ClientId={props.match.params.id} refresh={refresh} name={name} due={due} time={finalTime}/> 
+                          <ResetButton ClientId={props.match.params.id} in={timeIn} out={timeOut} paused={pausedStatus} refresh={refresh} name={name} due={due} time={finalTime}/> 
                           </span>
                       </span>
                       

@@ -1,38 +1,35 @@
 
-import React, {useEffect,useState,useRef} from 'react';
+import React, {useEffect,useState,useContext} from 'react';
 import axios from 'axios';
 import app from "../base";
 import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
-import ButtonGroup from 'react-bootstrap/ButtonGroup'
+
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import Card from 'react-bootstrap/Card'
-import ProductsSelectForm from './ProductsSelectForm.component'
-import SubscriptionButton from './SubscriptionButton.component'
-import DeleteProdsHistory from './DeleteProdsHistory.component'
-import { FaEnvelope, FaUserCircle,FaUsers,FaCartPlus,FaCalendarCheck, FaTimesCircle, FaTimes, FaClock, FaTools, FaInfo } from 'react-icons/fa';
-import { IoMdWalk,IoMdTimer } from "react-icons/io";
-import StopButton from './StopButton.component'
-import ResetButton from './ResetButton.component'
+
+import { FaEnvelope,FaUserCircle,FaInfo } from 'react-icons/fa';
+
+import { AuthContext } from "../Auth"
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
 
 
 
 function EditAdmin(props) {
+    const {currentUser} = useContext(AuthContext)
     const [email,setEmail] = useState('');
     const [name,setName] = useState('');
     const [log,setLog] = useState([])
-    
     // console.log(props.match.params.firebaseID);
     useEffect(()=>{
         let mounted = true;
         if(mounted){
             async function fetchData() {
                 function getFetchUrl() {
-                    return `${SERVER_URL}/admins/${props.match.params.firebaseID}` ;
+                    return `${SERVER_URL}/admins/${currentUser.uid}` ;
                   }
                 const result = await axios.get(getFetchUrl());
                 // console.log(result.data.data.admin.activityHistory);
@@ -65,7 +62,7 @@ function EditAdmin(props) {
             name
         }
         async function postName(){
-            await axios.post(`${SERVER_URL}/admins/update/${props.match.params.firebaseID}`,obj)
+            await axios.post(`${SERVER_URL}/admins/update/${currentUser.uid}`,obj)
         }
         postName()
     }

@@ -1,13 +1,11 @@
 import React, {Component,useEffect,useState} from 'react';
-import Button from 'react-bootstrap/Button';
+import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import FormControl from 'react-bootstrap/FormControl';
 import Spinner from 'react-bootstrap/Spinner'
-import Alert from 'react-bootstrap/Alert'
+
 import axios from 'axios';
-import { confirmAlert } from 'react-confirm-alert'; // Import
-import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
 

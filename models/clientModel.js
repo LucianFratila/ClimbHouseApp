@@ -2,10 +2,13 @@ const mongoose = require('mongoose');
 
 let clientsSchema = new mongoose.Schema({
     name:{
-        type:String,
+        type:String
         
     },
     
+    date:{type: Date, default: Date.now},
+    timeStamp:{type:Number,default:Date.now},
+
     email:{
         type:String,
         unique:true 
@@ -104,7 +107,35 @@ let clientsSchema = new mongoose.Schema({
     remainigSub:{
         type:Number,
         default:0
-    }
+    },
+    sessionHistory:[{
+        admin:{
+            type:String,
+        },
+
+        totalTime:{
+            type:Number
+        },
+        kids:{
+            type:Number
+        },
+        adults:{
+            type:Number
+        },
+        due:{
+            type:Number
+        },
+        kickedOF:{
+            type:Boolean,
+            default:false
+        },
+        timeIn:{
+            type:String
+        },
+        dateLog:{
+            type:Number
+        }
+    }]
         
     
    

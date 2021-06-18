@@ -1,10 +1,8 @@
 import React, {Component,useEffect,useState} from 'react';
-import Button from 'react-bootstrap/Button';
+import Button from 'react-bootstrap/Button'
 import Spinner from 'react-bootstrap/Spinner'
 import app from "../base";
-import { AuthProvider } from "../Auth";
-import PrivateRoute from "../PrivateRoute";
-import { AuthContext } from "../Auth";
+
 import { FaPlay } from 'react-icons/fa';
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 function StartButton(props){
