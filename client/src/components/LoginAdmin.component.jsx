@@ -44,20 +44,8 @@ const LoginAdmin = ({ history }) => {
           history.push("/active");
       } catch (error) {
 
-        confirmAlert({
-          
-          message: ` ${error}`,
-          buttons: [
-            {
-              label: 'Ok',
-              onClick: () => {
-                
-              }
-            }
-          ],
-          overlayClassName: "../index.css"
-        })
-        // alert(error.code);
+       
+        alert(error);
         
       }
     },

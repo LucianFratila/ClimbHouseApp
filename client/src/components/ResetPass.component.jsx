@@ -27,36 +27,11 @@ function ResetAdmin () {
             await app.auth().sendPasswordResetEmail(email).
             then(()=>{
 
-                confirmAlert({
-          
-                    message: `Reset password send to: ${email}`,
-                    buttons: [
-                        {
-                        label: 'Ok',
-                        onClick: () => {
-                            
-                        }
-                        }
-                    ],
-                    overlayClassName: "../index.css"
-                })
+                alert(`Reset password send to: ${email}`)
 
             })
         } catch (error) {
-            // console.log(error.message);
-            confirmAlert({
-          
-                message: ` ${error.message}`,
-                buttons: [
-                    {
-                    label: 'Ok',
-                    onClick: () => {
-                        
-                    }
-                    }
-                ],
-                overlayClassName: "../index.css"
-            })
+            alert(`${error.message}`)
             
         }
     }
