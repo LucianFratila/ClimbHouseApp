@@ -31,7 +31,7 @@ function ResetAdmin () {
 
             })
         } catch (error) {
-            alert(`${error.message}`)
+            alert(`git${error.message}`)
             
         }
     }

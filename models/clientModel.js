@@ -45,6 +45,36 @@ let clientsSchema = new mongoose.Schema({
         type: Number,
         default:0
     },
+    adultsClients:[{
+        name:{
+            type:String,
+        },
+        timeIn:{
+            type: Number,
+            default: 0
+        },
+        timeOut:{
+            type: Number,
+            default: 0
+        },
+        endTime:{
+            type: String,
+            default:''
+        },
+        status:{
+            type: Boolean,
+            default:false
+        },
+        startTime:{
+            type: String,
+            default:0
+        },
+        endTime:{
+            type: String,
+            default:0
+        },
+        
+    }],
     noOfpeopleClimbing:{
         type: Number,
         default:0

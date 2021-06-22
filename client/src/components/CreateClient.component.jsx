@@ -4,6 +4,7 @@ import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import FormControl from 'react-bootstrap/FormControl';
 import Spinner from 'react-bootstrap/Spinner'
+import Alert from 'react-bootstrap/Alert'
 
 import axios from 'axios';
 
@@ -12,7 +13,7 @@ const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
 
 function CreateClient(props){
-    const [capchaOK, setCapchaOk] = useState(false)
+    const [capchaOK, setCapchaOk] = useState(true)
     const [isLoading, setLoading] = useState(false);
     const [name,setName] = useState('');
     const [email,setEmail] = useState('');
@@ -102,7 +103,7 @@ function CreateClient(props){
     return(
         
     <span style={{width:'100%'}}>
-        {/* {
+        {
             submitted===true
             ?
             <Alert  variant='success'>
@@ -124,7 +125,7 @@ function CreateClient(props){
             </Alert>
             :
             null
-        } */}
+        }
         
         <ReCAPTCHA sitekey={process.env.REACT_APP_SITE_KEY} ref={reRef} onChange={CapchaOk} />
         <Form onSubmit={onSubmit}  >

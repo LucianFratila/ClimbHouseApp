@@ -30,24 +30,15 @@ function DeleteProdsHistory(props){
     }, [isLoading]);
    
     const handleClick = () => {
-      confirmAlert({
-        title: 'Delete product!',
-        message: `${props.prodQty} x ${props.prodName} = ${props.prodTotal}/lei ?`,
-        buttons: [
-          {
-            label: 'Yes',
-            onClick: () => {
-              props.refresh()
-              setLoading(true)
-            }
-          },
-          {
-            label: 'No',
-            onClick: () => props.refresh()
-          }
-        ],
-        overlayClassName: "../index.css"
-      })
+      if (confirm(`Delete products: ${props.prodQty} x ${props.prodName} = ${props.prodTotal}/lei ?`)) {
+        props.refresh()
+        setLoading(true)
+        
+      } else {
+        props.refresh()
+        
+      }
+      
         
         
     };

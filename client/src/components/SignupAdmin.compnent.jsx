@@ -7,8 +7,6 @@ import Col from 'react-bootstrap/Col'
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import axios from 'axios';
-// import { confirmAlert } from 'react-confirm-alert'; // Import
-// import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
@@ -68,20 +66,7 @@ const SignupAdmin = () => {
           var user = app.auth().currentUser;
 
           user.sendEmailVerification().then(function() {
-            // console.log(user);
-            // confirmAlert({
-          
-            //   message: `Confirmation email send to ${user.email}`,
-            //   buttons: [
-            //     {
-            //       label: 'Ok',
-            //       onClick: () => {
-                    
-            //       }
-            //     }
-            //   ],
-            //   overlayClassName: "../index.css"
-            // })
+            
             alert(`Confirmation email send to ${user.email}`)
             
 

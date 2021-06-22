@@ -352,13 +352,42 @@ exports.timeIN = catchAsync(async (req, res, next) => {
     runValidators: true
   });
 
+
+  //////////////Start and Create Adults////////////////////////////////////
+
+  const clientData = await Client.findById(req.params.id)
+  
+  
+
+  for (let index = 0; index < clientData.adults; index++) {
+  let dataAdults={}
+  dataAdults.timeIn=clientData.timeIn
+  dataAdults.startTime=clientData.startTime
+  dataAdults.status=true
+  dataAdults.name=`Adult ${index+1}`
+
+
+
+    await Client.findOneAndUpdate({_id:req.params.id},{
+      $addToSet: {
+        adultsClients:dataAdults
+    }
+    });
+    
+  }
+//////////////Start and Create Adults////////////////////////////////////
+
+
+
+
   if (!client) {
     return next(new AppError("No client found with that ID", 404));
   }
   
   res.status(200).json({
     status: "success",
-    data: { client }
+    data: 
+      { client }
   });
 });
 
@@ -473,25 +502,6 @@ exports.timeEnd = catchAsync(async (req, res, next) => {
   }
 
 
-
-// let a = 0 //nr copii
-// let b = 2 //nr adulti
-// let c = 20 //pret copii
-// let d = 25 //pret adulti
-
-// let y = 179//timp scurs in minute
-
-// let x = (a*c)+(b*d)
-// let z // pret final rotunjit in sus
-
-// if (y <= 35) {
-//   z = x
-// }
-// else {
-//   z = a*(c+(Math.ceil((y-35)/15))*5) + b*(d+(Math.ceil((y-35)/15))*5)
-// }
-
-
 //////////// LOGIC for Subscription ////////////////////
 
 
@@ -533,15 +543,6 @@ if (specs.statusSub===true) {
   ///////////////END of LOGIC for Subscription ////////////
 
 
-  // let timeHalfHourLogic = halfHourLogicFunction(afterClientEnd.finalTime);
-  
-  // if (timeHalfHourLogic < 1) {
-  //   timeHalfHourLogic = 1
-  // }else
-  //   timeHalfHourLogic
-
-  // aftertimeEnd.due = (timeHalfHourLogic*adultPrice)*afterClientEnd.adults + (timeHalfHourLogic*kidPrice)*afterClientEnd.kids
-
     const afterclient = await Client.findByIdAndUpdate(req.params.id, aftertimeEnd, {
       new: true,
       runValidators: true
@@ -577,6 +578,9 @@ if (specs.statusSub===true) {
   }
   });
   //////////////////////LOGS per Admin//////////////////////
+
+
+
   /////////////////////Logs history per Client////////////////////
   let clientLog={}
   clientLog.admin=`${adminDetails.email}`
@@ -592,8 +596,49 @@ if (specs.statusSub===true) {
         sessionHistory:clientLog
     }
     });
-  console.log(req.params.id);
-  console.log(clientLog);
+
+
+
+
+
+    //////////////End Time for all Adults////////////////////////////////////
+
+    const clientData = await Client.findById(req.params.id)
+    
+   
+    
+    
+3
+4
+    
+    let data = new Date().getFullYear()+'-'+(new Date().getMonth()+1)+'-'+new Date().getDate();
+    let ora = new Date().getHours() + ":" + new Date().getMinutes() + ":" + new Date().getSeconds();
+    let dataOra = data+' '+ora;
+    
+    let array=clientData.adultsClients
+   
+    for (let index = 0; index < array.length; index++) {
+      const element = array[index];
+      
+      await Client.findOneAndUpdate({_id: req.params.id, "adultsClients._id": element._id},
+        {
+          $set: {
+          "adultsClients.$.timeOut": clientData.timeOut,
+          "adultsClients.$.endTime": dataOra,
+          "adultsClients.$.status": false
+
+        }}
+      )
+
+  
+      
+      
+    }
+    
+  //////////////Start and Create Adults////////////////////////////////////
+
+
+
 
 
 
@@ -602,6 +647,8 @@ if (specs.statusSub===true) {
 
 ///RESET Time and write in log the reset (Kick Out in client side) CLIENTS TIME FOR SPECIFIC CLIENT
 exports.reset = catchAsync(async (req, res, next) => {
+
+  await Client.updateMany({},{$unset: {adultsClients:1}},{multi: true});//////clear adults list
 
   const errorCheck = await Client.findById(req.params.id)
   if (errorCheck.timeIn>0) {
@@ -720,10 +767,10 @@ exports.reset = catchAsync(async (req, res, next) => {
 
 
 
-
+/////////////Dismiss button
 exports.resetAfterEndTime = catchAsync(async (req, res, next) => {
 
-
+  await Client.updateMany({},{$unset: {adultsClients:1}},{multi: true});
   
 
   let prodsBackEnd = {}
@@ -774,6 +821,8 @@ exports.resetAfterEndTime = catchAsync(async (req, res, next) => {
     status: "success",
     data: { client }
   });
+
+
 });
 
 
@@ -836,3 +885,40 @@ exports.resetAfterEndTime = catchAsync(async (req, res, next) => {
 // intrariRamase = optiuneAbonament-noCopii*(Math.ceil((timpScurs-5)/30))
 
 // console.log('abonam:', intrariRamase);
+
+
+
+
+
+
+// let a = 0 //nr copii
+// let b = 2 //nr adulti
+// let c = 20 //pret copii
+// let d = 25 //pret adulti
+
+// let y = 179//timp scurs in minute
+
+// let x = (a*c)+(b*d)
+// let z // pret final rotunjit in sus
+
+// if (y <= 35) {
+//   z = x
+// }
+// else {
+//   z = a*(c+(Math.ceil((y-35)/15))*5) + b*(d+(Math.ceil((y-35)/15))*5)
+// }
+
+
+
+
+
+
+
+  // let timeHalfHourLogic = halfHourLogicFunction(afterClientEnd.finalTime);
+  
+  // if (timeHalfHourLogic < 1) {
+  //   timeHalfHourLogic = 1
+  // }else
+  //   timeHalfHourLogic
+
+  // aftertimeEnd.due = (timeHalfHourLogic*adultPrice)*afterClientEnd.adults + (timeHalfHourLogic*kidPrice)*afterClientEnd.kids

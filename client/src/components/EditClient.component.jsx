@@ -102,6 +102,7 @@ function EditClient(props) {
     const [history,setHistory]=useState([])
     const [showHistory,setShowHistory]=useState(false)
     const [dateCreated,setDateCreated]=useState('')
+    const [adultsList,setAdultsList]=useState([])
     // console.log(history);
 
 
@@ -177,7 +178,7 @@ function EditClient(props) {
                     return `${SERVER_URL}/clients/` + props.match.params.id;
                   }
                 const result = await axios(getFetchUrl());
-                // console.log(result.data.data.client.date);
+                setAdultsList(result.data.data.client.adultsClients);
                 setDateCreated(result.data.data.client.date)
                 setHistory(result.data.data.client.sessionHistory)
                 setAdults(result.data.data.client.adults);
@@ -350,6 +351,33 @@ function EditClient(props) {
                       </Col>
                     </Row>
                     <Row xl={4} lg={3} md={2} sm={2} xs={1} style={{backgroundColor:'#404040'}} >
+                              {
+                                adultsList.map((item) => (
+                                  <Col key={item._id}>
+                                      <Card
+                                      bg='secondary'
+                                      style={{width:'auto',marginTop:'10px',marginBottom:'10px'}}
+                                      text='light'
+                                      
+                                      
+                                    >
+                                    <Card.Header>{item.name}<span style={{float:'right'}}></span></Card.Header>
+                                      <Card.Body>
+                                        
+                                        <Card.Text>
+                                          
+                                          
+                                        </Card.Text>
+                                      </Card.Body>
+                                    </Card>
+                                    </Col>
+                                    ))
+                                    
+                              }
+                      
+                      
+                    </Row>
+                    <Row xl={4} lg={3} md={2} sm={2} xs={1} style={{backgroundColor:'black'}} >
                               {
                                 prodHistory.map((item) => (
                                   <Col key={item._id}>
