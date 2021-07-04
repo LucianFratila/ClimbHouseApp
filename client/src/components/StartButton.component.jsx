@@ -51,9 +51,10 @@ function StartButton(props){
 
 
     return(
+      <span>
         <Button 
         variant="success"
-        size='1.4em'
+        size='lg'
         disabled={isLoading,props.status}
         onClick={
           !isLoading ? handleClick : null
@@ -73,8 +74,10 @@ function StartButton(props){
           
           </span>
          
-        : <FaPlay size='1.4em' />}
+        : <FaPlay size='1.2em' />}
         </Button>
+      </span>
+        
     )
 }
 

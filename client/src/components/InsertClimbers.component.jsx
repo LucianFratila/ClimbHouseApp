@@ -10,6 +10,10 @@ const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
 
 function InsertClimbers(props){
+    const [isLoading, setLoading] = useState(false);
+    const [adults,setAdults] = useState(0);
+    const [kids,setKids] = useState(0)
+    const [show, setShow] = useState(false);
     const onChangeAdults=(e)=>{
         setAdults(e.target.value)
         }
@@ -41,10 +45,7 @@ function InsertClimbers(props){
         
     }
   
-        const [isLoading, setLoading] = useState(false);
-        const [adults,setAdults] = useState(props.noAdult);
-        const [kids,setKids] = useState(props.noKids)
-        const [show, setShow] = useState(false);
+        
       
         
         // useEffect(()=>{

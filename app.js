@@ -1,6 +1,7 @@
 
 const express = require('express');
 const bodyParser = require('body-parser')
+// import bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const dotenv = require("dotenv");
 const morgan = require('morgan');
@@ -25,11 +26,14 @@ db.on('error', function(err){
 const app = express();
 // middleware cors
 app.use(cors());
+
 //Body parser middleware
 app.use(bodyParser.urlencoded({ extended: false }))
 
 // parse application/json, reading data from body into req.body
 app.use(bodyParser.json())
+// app.use(express.urlencoded()); //Parse URL-encoded bodies
+// app.use(express.json()); //Used to parse JSON bodies
 
 //routes
 app.use("/api/v1/clients", clientRouter);

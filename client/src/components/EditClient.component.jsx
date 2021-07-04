@@ -16,6 +16,7 @@ import { FaEnvelope, FaUserCircle,FaUsers,FaCartPlus,FaCalendarCheck, FaPlay, Fa
 import { IoMdWalk,IoMdTimer } from "react-icons/io";
 import StopButton from './StopButton.component'
 import ResetButton from './ResetButton.component'
+import { json } from 'body-parser';
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
 function MyVerticallyCenteredModal(props) {
@@ -76,7 +77,8 @@ function MyVerticallyCenteredModal(props) {
 
 
 function EditClient(props) {
-    const [loading,setLoading] = useState(true)
+    const [loading,setLoading] = useState(false)
+    const [climberID,setClimberID]=useState()
     const [prodHistory, setProdhistory] = useState([]);
     const [adults, setAdults] = useState(0);
     const [status, setStatus] = useState();
@@ -85,7 +87,7 @@ function EditClient(props) {
     const [phone,setPhone] = useState('');
     const [email,setEmail] = useState('');
     const [prods,setProds] = useState([]);
-    const [alert, setAlert] = useState(false);
+    const [alertT, setAlert] = useState(false);
     const [due,setDue] = useState(0)
     const [finalTime,setFinalTime] = useState(0)
     const [selectedOption, setSelectedOption] = useState(null)
@@ -102,24 +104,27 @@ function EditClient(props) {
     const [history,setHistory]=useState([])
     const [showHistory,setShowHistory]=useState(false)
     const [dateCreated,setDateCreated]=useState('')
-    const [adultsList,setAdultsList]=useState([])
-    // console.log(history);
+    const [climbersList,setClimbersList]=useState([])
+    
 
 
     const [counter, setCounter] = useState(0);
 
-    useEffect(() => {
-        if(alert) {
-          setTimeout(() => {
-            setAlert(false);
-          }, 1000)
-        }
-      }, [alert])
+    // useEffect(() => {
+    //     if(alertT) {
+    //       setTimeout(() => {
+    //         setAlert(false);
+    //       }, 30000)
+    //     }
+    //   }, [alertT])
 
       const refresh = ()=>{
-        setAlert(true)
+        
+        {alertT===false?setAlert(true):setAlert(false)}
+        
         
     }
+    console.log(alertT);
 
     function useInterval(callback, delay) {
         const savedCallback = useRef();
@@ -178,7 +183,8 @@ function EditClient(props) {
                     return `${SERVER_URL}/clients/` + props.match.params.id;
                   }
                 const result = await axios(getFetchUrl());
-                setAdultsList(result.data.data.client.adultsClients);
+                // console.log(result.data.data.climbers);
+                setClimbersList(result.data.data.climbers);
                 setDateCreated(result.data.data.client.date)
                 setHistory(result.data.data.client.sessionHistory)
                 setAdults(result.data.data.client.adults);
@@ -212,7 +218,9 @@ function EditClient(props) {
         
          
         
-    },[alert])
+    },[alertT])
+
+    
     
     let trasnfer = (a) => {
         // console.log(a);
@@ -243,6 +251,29 @@ function EditClient(props) {
       refresh()
       // console.log(sub);
   }
+  
+  
+
+  
+ 
+  const stopAdultsIndividual=async(id)=>{
+    
+    try {
+      await axios({
+        method:'POST',
+        url:`${SERVER_URL}/clients/endIndividualAdult/${props.match.params.id}/${id}`,
+      
+      })
+      
+    } catch (error) {
+      
+      // console.log(error.response.data.message);
+      alert(error.response.data.message)
+    }
+    refresh()
+    
+  }
+  
 
   let totalHistory = prodHistory.reduce(function(prev, cur) {
     return prev + cur.total;
@@ -279,7 +310,7 @@ function EditClient(props) {
                         ?
                         <span>0 clibers</span>
                         :
-                        <span>{adults + kids}  @ {adults} adult(s) / {kids} kid(s)</span>
+                        <span>{adults + kids}/  @ {adults} adult(s) / {kids} kid(s)</span>
                         }
                         </span>
                         </Col>
@@ -352,20 +383,21 @@ function EditClient(props) {
                     </Row>
                     <Row xl={4} lg={3} md={2} sm={2} xs={1} style={{backgroundColor:'#404040'}} >
                               {
-                                adultsList.map((item) => (
+                                climbersList.map((item) => (
                                   <Col key={item._id}>
                                       <Card
-                                      bg='secondary'
+                                      bg={item.status===true?'success':'danger'}
                                       style={{width:'auto',marginTop:'10px',marginBottom:'10px'}}
                                       text='light'
                                       
                                       
                                     >
-                                    <Card.Header>{item.name}<span style={{float:'right'}}></span></Card.Header>
+                                    <Card.Header>{item.name}-Time: {item.finalTime} min<span style={{float:'right'}}></span></Card.Header>
                                       <Card.Body>
                                         
                                         <Card.Text>
                                           
+                                          <Button variant='warning' onClick={()=>{stopAdultsIndividual(item._id);setClimberID(item._id);refresh()}}>Stop</Button>
                                           
                                         </Card.Text>
                                       </Card.Body>

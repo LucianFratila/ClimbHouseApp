@@ -25,8 +25,12 @@ router
 .post(clientController.createClient)//add client
 
 router
+.route("/addClimber/:ownerId")
+.post(clientController.createClimber)//add climber
+
+router
 .route("/:id")
-.get(clientController.getClient)//get client by id 
+.get(clientController.getClient)//get client by id
 
 router
 .route("/4active/:id")
@@ -62,6 +66,14 @@ router
 router
 .route("/end/:id/:fireBaseId")
 .post(clientController.timeEnd)//end time for client by id
+
+router
+.route("/endAll/:id/:fireBaseId")
+.post(clientController.timeEndAll)//end all by id
+
+router
+.route("/endIndividual/:climberId/:id")
+.post(clientController.endIndividual)//end time for client by id
 
 router
 .route("/subscription/:id")

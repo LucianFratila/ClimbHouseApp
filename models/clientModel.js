@@ -45,6 +45,14 @@ let clientsSchema = new mongoose.Schema({
         type: Number,
         default:0
     },
+    adultsRemaining:{
+        type: Number,
+        default:0
+    },
+    kidsRemaining:{
+        type: Number,
+        default:0
+    },
     adultsClients:[{
         name:{
             type:String,
@@ -71,6 +79,10 @@ let clientsSchema = new mongoose.Schema({
         },
         endTime:{
             type: String,
+            default:0
+        },
+        due:{
+            type:Number,
             default:0
         },
         
@@ -111,6 +123,14 @@ let clientsSchema = new mongoose.Schema({
         type:Number,
         default:0
     },
+    dueList:[{
+        climber:{
+            type:String,
+        },
+        due:{
+            type:Number
+        }
+    }],
     prodHistory:[{
         productName:{
             type:String,

@@ -17,6 +17,7 @@ import CardGroup from 'react-bootstrap/CardGroup'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import InputGroup from 'react-bootstrap/InputGroup'
 import { FaArrowAltCircleUp, FaArrowCircleDown } from 'react-icons/fa';
+import StopAll from './StopAll.component';
 
 
 
@@ -249,7 +250,7 @@ function ClientListSuper(props){
                                             client.timeOut > 0
                                             ?
                                             <span>
-                                            Started: {client.startTime} ~  {client.finalTime}/min @ {client.due}/lei 
+                                            Started: {client.startTime} ~  {client.finalTime}/min @ {client.dueList.reduce((prev, cur) => prev + cur.due, 0)}/lei 
                                             </span>
                                             :
                                             <span>
@@ -269,11 +270,13 @@ function ClientListSuper(props){
                                 <InsertClimbers noAdult={client.adults} refresh={refresh} noKids={client.kids} ClientId={client._id}/>
                                 
                                 :
-                                <ButtonGroup size="lg" className="mb-2">
+                                <span>
                                     <StartButton ClientId={client._id} refresh={refresh} status={client.status} />
-                                    <StopButton ClientId={client._id} refresh={refresh} timeOut={client.timeOut} status={client.status} name={client.name}/> 
-                                    {/* <ResetButton ClientId={client._id} refresh={refresh} name={client.name} due={client.due} time={client.finalTime}/> */}
-                                </ButtonGroup>
+                                    <StopAll ClientId={client._id}  refresh={refresh}/>
+                                </span>
+                                    
+                                   
+                                
 
                             }
                             

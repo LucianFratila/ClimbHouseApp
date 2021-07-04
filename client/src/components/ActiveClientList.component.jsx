@@ -13,7 +13,7 @@ import Form from 'react-bootstrap/Form'
 import Modal from 'react-bootstrap/Modal'
 import InputGroup from 'react-bootstrap/InputGroup'
 import FormControl from 'react-bootstrap/FormControl'
-
+import StopAll from './StopAll.component';
 import Card from 'react-bootstrap/Card'
 import Container from 'react-bootstrap/Container'
 import CardGroup from 'react-bootstrap/CardGroup'
@@ -436,6 +436,7 @@ function ClientList(){
     
     
     let totalClimbers = clients.reduce((accumulator, current) => accumulator + current.noOfpeopleClimbing, 0);
+    let totalClimbersRemaining = clients.reduce((accumulator, current) => accumulator + (current.adultsRemaining+current.kidsRemaining), 0);
     
 
 
@@ -528,6 +529,8 @@ function ClientList(){
                 setClients(result.data.clients);
                 setPriceAdults(result.data.adultPrice);
                 setPriceKids(result.data.kidPrice);
+                // setDueTotal(result.data.data.client.dueList.reduce((prev, cur) => prev + cur.due, 0));
+                
                 
                 
                 
@@ -558,10 +561,10 @@ function ClientList(){
 
 
     
-    const toggleFilterClients =(e)=>{
-        e.preventDefault();
-        setReverseOrder(reverseOrder===true?false:true)
-    }
+    // const toggleFilterClients =(e)=>{
+    //     e.preventDefault();
+    //     setReverseOrder(reverseOrder===true?false:true)
+    // }
 
 
     // console.log(reverseOrder);
@@ -601,7 +604,7 @@ function ClientList(){
             <span style={{marginTop:'10px',marginLeft:'15px',marginRight:'15px'}}>
                 <h3>Active Clients </h3>
                 
-                <span style={{verticalAlign:'middle',display:'table-cell'}}>Total Climbers in Gym: {totalClimbers>20?<span style={{color:'red',fontSize:'40px'}}>{totalClimbers}</span>:<span style={{color:'green',fontSize:'40px'}}>{totalClimbers}</span>}</span>
+                <span style={{verticalAlign:'middle',display:'table-cell'}}>Total Climbers in Gym: {totalClimbers>20?<span style={{color:'red',fontSize:'40px'}}>{totalClimbers} {totalClimbersRemaining!==0?`/ Remaining (${totalClimbersRemaining})`:null} </span>:<span style={{color:'green',fontSize:'40px'}}>{totalClimbers}  {totalClimbersRemaining!==0?` / Remaining (${totalClimbersRemaining})`:null}</span>}</span>
             </span>
 
             
@@ -674,9 +677,9 @@ function ClientList(){
                             :
                             <span>
                                 <span style={{marginLeft:'3px', fontSize:'25px',}}>{client.name} </span>
-                                <span style={{fontSize:'15px',color:'white',marginLeft:'10px'}}>
+                                {/* <span style={{fontSize:'15px',color:'white',marginLeft:'10px'}}>
                                     (Adults:{client.adults}・Kids:{client.kids}) 
-                                </span>
+                                </span> */}
                             </span>
                             
                         }
@@ -706,7 +709,12 @@ function ClientList(){
                                         client.timeOut
                                         ?
                                         <span style={{fontSize:'20px',color:'white', marginRight:'10', fontWeight:'bolder'}}>
-                                           ~ {client.finalTime}/min @ {client.due}/lei
+                                           ~ {client.finalTime}(initial time) /min @ {
+                                               client.dueList===undefined?
+                                               0
+                                               :
+                                                client.dueList.reduce((prev, cur) => prev + cur.due, 0)
+                                           }/lei
                                         </span>
                                         :
                                             client.pausedStatus === false
@@ -756,8 +764,10 @@ function ClientList(){
                                 <span>
                                 <ButtonGroup size="lg" className="mb-2">
                                 {/* <StartButton ClientId={client._id} refresh={refresh} status={client.status} /> */}
-                                <PauseButton ClientId={client._id} refresh={refresh} timeOut={client.timeOut} name={client.name} status={client.status} paused={client.pausedStatus}/>
-                                <StopButton ClientId={client._id} refresh={refresh} timeOut={client.timeOut} status={client.status} name={client.name} paused={client.pausedStatus}/> 
+                                {/* <PauseButton ClientId={client._id} refresh={refresh} timeOut={client.timeOut} name={client.name} status={client.status} paused={client.pausedStatus}/> */}
+                                {/* {client.timeOut===0?null:<StopAll ClientId={client._id} refresh={refresh}/>} */}
+                                <StopAll ClientId={client._id} refresh={refresh}/>
+                                {/* <StopButton ClientId={client._id} refresh={refresh} timeOut={client.timeOut} status={client.status} name={client.name} paused={client.pausedStatus}/>  */}
                                     
                                 </ButtonGroup>
                                 {

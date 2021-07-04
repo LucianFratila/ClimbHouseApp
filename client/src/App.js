@@ -5,6 +5,7 @@ import './index.css'
 import ClientList from "./components/ClientList.component";
 import ActiveClientList from "./components/ActiveClientList.component";
 import EditClient from "./components/EditClient.component";
+import EditClientProvisional from "./components/EditClientProvisional.component";
 import Settings from "./components/Settings.component";
 import MainNavNoSuperAdmin from "./components/MainNavNoSuperAdmin.component";
 import MainNavSuperAdmin from "./components/MainNavSuper.component";
@@ -49,7 +50,7 @@ function App() {
       <PrivateRoute path = '/' exact component={ClientList}/>
       <SuperPrivateRouter path = '/cs' exact component={ClientListSuper}/>
       <PrivateRoute path = '/active' exact component={ActiveClientList}/>
-      <PrivateRoute path = '/edit/:id' component={EditClient}/>
+      <PrivateRoute path = '/edit/:id' component={EditClientProvisional}/>
       <PrivateRoute path = '/settings' component={Settings} />
       <PrivateRoute path = '/admins/:firebaseID' component={EditAdmin} />
       <SuperPrivateRouter path = '/logs' component={AdminLogs} />

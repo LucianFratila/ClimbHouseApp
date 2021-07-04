@@ -1,10 +1,13 @@
 const { query } = require('express');
 const Client = require('../models/clientModel');
+const Climber = require('../models/climbersModel');
 const Products = require('../models/productsModel');
 const Settings = require('../models/settingsModel');
 const AppError = require("./../utils/appError");
 const catchAsync = require('./../utils/catchAsync');
 const Admin = require('../models/adminModel');
+const { ObjectId } = require('mongoose');
+var mongoose = require('mongoose')
 
 
 ///CREATE CLIENT
@@ -18,9 +21,69 @@ exports.createClient = catchAsync(async (req, res, next) => {
       },
     });
   });
+
+  ///CREATE CLIMBER
+exports.createClimber = catchAsync(async (req, res, next) => {
+ 
+  const client = await Client.findById({_id:req.params.ownerId}).select('name + status + timeOut + finalTime + timeIn')
+  // console.log(client);
+  let d = new Date();
+  let n = d.toLocaleTimeString();
+  let dataObj={}
+  dataObj.owner=req.params.ownerId;
+  dataObj.ownerName=client.name;
+  dataObj.timeIn=Date.now()
+  dataObj.status=true
+  
+  dataObj.timeStamp=Date.now()
+  dataObj.startTime=n
+  if (req.body.climber==='adult') {
+    dataObj.adult=true
+    
+    
+  }
+  if (req.body.climber==='kid') {
+    dataObj.kid=true
+    
+    
+  }
+  if (req.body.name==='') {
+    dataObj.name=`Unknown ${req.body.climber==='adult'?'adult':'kid'} climber`
+  } else {
+    dataObj.name=`${req.body.climber==='adult'?'Adult':'Kid'} climber: ${req.body.name}`
+  }
+  // console.log(client.timeOut,client.finalTime,client.timeIn,client.status);
+  if (client.timeIn>0 && client.timeOut===0 && client.finalTime===0 && client.status===true ) {
+    try {
+      await Climber.create(dataObj)
+    } catch (error) {
+      console.log(error);
+    }
+    res.status(200).json({
+      status: 'success',
+    }); 
+  } else {
+    if (client.status===true) {
+      res.status(409).send({
+        message: 'Time stopped'
+     })
+    } else {
+      res.status(409).send({
+        message: 'Client inactive'
+     })
+    }
+    
+    
+  }
+   
+  
+  
+  
+});
 ///GET ALL CLIENTS
 exports.getAllClients = catchAsync(async (req, res, next) => {
 let search = req.query.search
+
 const climbers = await Client.aggregate(
   [{
       $group: {
@@ -48,7 +111,7 @@ const settings = await Settings.find()
       adultPrice: settings[0].adultPrice,
       kidPrice: settings[0].kidPrice,
       results: clientsLength.length,
-      active: active.length,
+      active: active.length
       // clibersInGym:totalResult
   });
 });
@@ -116,6 +179,7 @@ exports.totalsClimbers = catchAsync(async (req, res, next) => {
 ///GET SPECIFIC CLIENT
 exports.getClient = catchAsync(async (req, res, next) => {
   const client = await Client.findById(req.params.id)
+  const climbers= await Climber.find({'owner':req.params.id})
   const products = await Products.find()
 
   if (!client) {
@@ -126,6 +190,7 @@ exports.getClient = catchAsync(async (req, res, next) => {
     status: "success",
     data: { 
       client,
+      climbers,
       products
      }
   });
@@ -170,6 +235,7 @@ exports.updateClient = catchAsync(async (req, res, next) => {
 ///DELETE SPECIFIC CLIENT
 exports.deleteClient = catchAsync(async (req, res, next) => {
   const client = await Client.findByIdAndDelete(req.params.id);
+  const climbers = await Climber.deleteMany({'owner':req.params.id})
 
   if (!client) {
     return next(new AppError("No client found with that ID", 404));
@@ -357,7 +423,7 @@ exports.timeIN = catchAsync(async (req, res, next) => {
 
   const clientData = await Client.findById(req.params.id)
   
-  
+  // console.log(clientData);
 
   for (let index = 0; index < clientData.adults; index++) {
   let dataAdults={}
@@ -365,16 +431,31 @@ exports.timeIN = catchAsync(async (req, res, next) => {
   dataAdults.startTime=clientData.startTime
   dataAdults.status=true
   dataAdults.name=`Adult ${index+1}`
+  dataAdults.adult=true
+  dataAdults.owner= req.params.id
+  dataAdults.ownerName=clientData.name
 
 
 
-    await Client.findOneAndUpdate({_id:req.params.id},{
-      $addToSet: {
-        adultsClients:dataAdults
-    }
-    });
+    await Climber.create(dataAdults);
     
   }
+
+  for (let index = 0; index < clientData.kids; index++) {
+    let dataAdults={}
+    dataAdults.timeIn=clientData.timeIn
+    dataAdults.startTime=clientData.startTime
+    dataAdults.status=true
+    dataAdults.name=`Kid ${index+1}`
+    dataAdults.kid=true
+    dataAdults.owner= req.params.id
+    dataAdults.ownerName=clientData.name
+  
+  
+  
+      await Climber.create(dataAdults);
+      
+    }
 //////////////Start and Create Adults////////////////////////////////////
 
 
@@ -449,6 +530,9 @@ function halfHourLogicFunction (time){
 ////////////TIME////////////////////////
 
 
+
+
+
 ///FINISH TIME FOR SPECIFIC CLIENT
 exports.timeEnd = catchAsync(async (req, res, next) => {
 
@@ -502,47 +586,8 @@ exports.timeEnd = catchAsync(async (req, res, next) => {
   }
 
 
-//////////// LOGIC for Subscription ////////////////////
 
-
-const specs = await Client.findById(req.params.id)
-
-let noClienti = specs.kids + specs.adults;
-let timpScurs = specs.finalTime;//minute
-let optiuneAbonament = specs.initialSub;//jumatati de ora
-let ramasAbonament = specs.remainigSub
-// console.log(noClienti,' / ',timpScurs,' / ',optiuneAbonament);
-// let intrariRamase
-if (specs.statusSub===true) {
-
-  if (specs.remainigSub === 0) {
-    let value={}
-    value.remainigSub = optiuneAbonament-noClienti*(Math.ceil((timpScurs-5)/30));
-    const client = await Client.findByIdAndUpdate(req.params.id, value, {
-      new: true,
-      runValidators: true
-    });
-    
-    
-  } else {
-    let value={}
-    value.remainigSub = ramasAbonament-noClienti*(Math.ceil((timpScurs-5)/30));
-    const client = await Client.findByIdAndUpdate(req.params.id, value, {
-      new: true,
-      runValidators: true
-    });
-  }
-  
-} 
-
-
-
-
-
-
-  ///////////////END of LOGIC for Subscription ////////////
-
-
+  ////////////////////////LOGS per Admin//////////////////////
     const afterclient = await Client.findByIdAndUpdate(req.params.id, aftertimeEnd, {
       new: true,
       runValidators: true
@@ -551,9 +596,9 @@ if (specs.statusSub===true) {
     // console.log(fireBaseIdFrontend);
 
     const adminDetails = await Admin.findOne({fireBaseId:fireBaseIdFrontend})
-    // console.log(admin);
+  
 
-    ////////////////////////LOGS per Admin//////////////////////
+    
     const clientQuery4Admin = await Client.findById(req.params.id)
     let today = new Date();
     let dd = String(today.getDate()).padStart(2, '0');
@@ -601,41 +646,7 @@ if (specs.statusSub===true) {
 
 
 
-    //////////////End Time for all Adults////////////////////////////////////
 
-    const clientData = await Client.findById(req.params.id)
-    
-   
-    
-    
-3
-4
-    
-    let data = new Date().getFullYear()+'-'+(new Date().getMonth()+1)+'-'+new Date().getDate();
-    let ora = new Date().getHours() + ":" + new Date().getMinutes() + ":" + new Date().getSeconds();
-    let dataOra = data+' '+ora;
-    
-    let array=clientData.adultsClients
-   
-    for (let index = 0; index < array.length; index++) {
-      const element = array[index];
-      
-      await Client.findOneAndUpdate({_id: req.params.id, "adultsClients._id": element._id},
-        {
-          $set: {
-          "adultsClients.$.timeOut": clientData.timeOut,
-          "adultsClients.$.endTime": dataOra,
-          "adultsClients.$.status": false
-
-        }}
-      )
-
-  
-      
-      
-    }
-    
-  //////////////Start and Create Adults////////////////////////////////////
 
 
 
@@ -650,12 +661,12 @@ exports.reset = catchAsync(async (req, res, next) => {
 
   await Client.updateMany({},{$unset: {adultsClients:1}},{multi: true});//////clear adults list
 
-  const errorCheck = await Client.findById(req.params.id)
-  if (errorCheck.timeIn>0) {
-    console.log('time has started');
-  } else {
-    console.log('time has Not started');
-  }
+  // const errorCheck = await Client.findById(req.params.id)
+  // if (errorCheck.timeIn>0) {
+  //   console.log('time has started');
+  // } else {
+  //   console.log('time has Not started');
+  // }
   
 
 
@@ -691,7 +702,7 @@ exports.reset = catchAsync(async (req, res, next) => {
     let adminLog = {}
     adminLog.adminEmailName = `${adminDetails.email}`
     adminLog.adminFireBaseId = fireBaseIdFrontend
-    adminLog.clientName = `${clientQuery4Admin.name} / k: ${clientQuery4Admin.kids} | a: ${clientQuery4Admin.adults} | t: ${calTimeAfterReset}/min | $: ${dueFromClientSide} lei`
+    adminLog.clientName = `${clientQuery4Admin.name} / k: ${clientQuery4Admin.kids} | a: ${clientQuery4Admin.adults} | t: ${calTimeAfterReset}/min `
     adminLog.start = `${clientQuery4Admin.startTime} / ${today}`
     adminLog.kickOutStatus=true
     adminLog.clientTimeIn=clientQuery4Admin.timeIn
@@ -742,9 +753,19 @@ exports.reset = catchAsync(async (req, res, next) => {
   reset.noOfpeopleClimbing=0
   reset.status = false;
   reset.startTime = 0;
+  reset.adultsRemaining = 0;
+  reset.kidsRemaining = 0;
   reset.due = 0
   
-  
+      //////////////reset all climbers and Due from Client////////////////////////////////////
+
+      const climbers = await Climber.deleteMany({'owner':req.params.id})
+
+      await Client.updateMany({},{$unset: {dueList:1}},{multi: true});
+    
+      //////////////reset all climbers////////////////////////////////////
+
+      
   
   const client = await Client.findByIdAndUpdate(req.params.id, reset, {
     new: true,
@@ -770,7 +791,11 @@ exports.reset = catchAsync(async (req, res, next) => {
 /////////////Dismiss button
 exports.resetAfterEndTime = catchAsync(async (req, res, next) => {
 
-  await Client.updateMany({},{$unset: {adultsClients:1}},{multi: true});
+  const clientCheck = await Client.findById({_id:req.params.id})
+  
+  if (clientCheck.timeOut>0) {
+
+    await Client.updateMany({},{$unset: {adultsClients:1}},{multi: true});
   
 
   let prodsBackEnd = {}
@@ -813,6 +838,18 @@ exports.resetAfterEndTime = catchAsync(async (req, res, next) => {
     runValidators: true
   });
 
+//////////////reset all climbers////////////////////////////////////
+
+await Climber.deleteMany({'owner':req.params.id})
+
+//////////////reset all climbers////////////////////////////////////
+
+//////////////reset dueList////////////////////////////////////
+
+await Client.updateMany({_id:req.params.id},{$unset: {dueList:1}},{multi: true});
+
+//////////////reset dueList////////////////////////////////////
+  
   if (!client) {
     return next(new AppError("No client found with that ID", 404));
   }
@@ -821,9 +858,295 @@ exports.resetAfterEndTime = catchAsync(async (req, res, next) => {
     status: "success",
     data: { client }
   });
+    
+  } else {
+    if (clientCheck.status===false) {
+      res.status(409).send({
+        message: 'Client inactive'
+     })
+    }
+    if (clientCheck.timeOut===0&&clientCheck.status===true) {
+      res.status(409).send({
+        message: 'Time is still on.'
+     })
+    }
+    
+    
+  }
+
+  
 
 
 });
+
+
+
+/////////////////// Individual End time Controls  ////////////////////////////
+
+exports.endIndividual = catchAsync(async (req, res, next) => {
+
+  const climbers = await Climber.find({_id:req.params.climberId})
+  const settingsEnd = await Settings.find()
+
+  let dataObj={}
+  dataObj.timeOut=Date.now()
+  dataObj.status=false
+  dataObj.finalTime=((((Date.now()-climbers[0].timeIn)/1000)/60).toFixed(0))
+  
+
+  if (climbers[0].status===true) {
+    try {
+      await Climber.findByIdAndUpdate({_id:req.params.climberId},dataObj)
+      const adultsLength=await Climber.find({'owner':req.params.id,'adult':true,'status':true})
+      const kidsLength=await Climber.find({'owner':req.params.id,'kid':true,'status':true})
+      
+      let dataClientObj={}
+      dataClientObj.adultsRemaining=adultsLength.length
+      dataClientObj.kidsRemaining=kidsLength.length
+      await Client.findByIdAndUpdate({_id:req.params.id},dataClientObj)
+      ////////////individual due logic//////////////////////////////////
+      const afterClimberEnd = await Climber.find({_id:req.params.climberId})
+      let adultPrice = settingsEnd[0].adultPrice
+      let kidPrice = settingsEnd[0].kidPrice
+      let a = 1 //nr copii
+      let b = 1 //nr adulti
+      let c = kidPrice //pret copii
+      let d = adultPrice //pret adulti
+      let y = afterClimberEnd[0].finalTime//timp scurs
+      let kid = (a*c)
+      let adult = (b*d)
+      let kidOver35min = a*(c+(Math.ceil((y-35)/15))*5) // pret final rotunjit in sus
+      let adultOver35min = b*(d+(Math.ceil((y-35)/15))*5) // pret final rotunjit in sus
+    
+      let aftertimeEnd={}
+
+      if (climbers[0].kid===true) {
+        if (y <= 35) {
+          aftertimeEnd.due = kid
+        }
+        else {
+          aftertimeEnd.due = kidOver35min
+        }
+      }
+      if (climbers[0].adult===true) {
+        if (y <= 35) {
+          aftertimeEnd.due = adult
+        }
+        else {
+          aftertimeEnd.due = adultOver35min
+        }
+      }
+      await Climber.findByIdAndUpdate({_id:req.params.climberId},aftertimeEnd)
+
+      ////////////individual due logic//////////////////////////////////
+
+
+    } catch (error) {
+      console.log(error);
+    }
+
+    const climbersDue = await Climber.find({_id:req.params.climberId}).select('due')
+    let climberDueObj={}
+    climberDueObj.climber=climbersDue[0]._id
+    climberDueObj.due=climbersDue[0].due
+
+
+  await Client.findOneAndUpdate({_id:req.params.id},{
+    $addToSet: {
+      dueList:climberDueObj
+  }
+  });
+
+    res.status(200).json({
+      status: "success"
+    });
+    
+    
+  } else {
+      res.status(409).send({
+         message: 'Time was stopped'
+      })
+  }
+  
+ 
+
+
+});
+
+
+//////////////////////////STOP ALL////////////////////////////
+exports.timeEndAll = catchAsync(async (req, res, next) => {
+  var start = Date.now()
+  var hrstart = process.hrtime()
+  const client = await Client.findById(req.params.id);
+  const climber = await Climber.find({'owner':req.params.id})
+  
+  const settingsEnd = await Settings.find()
+  const afterClimberEnd = await Climber.find({'owner':req.params.id})
+  
+
+  if (client.timeOut===0&&client.status===true) {
+
+    for (let index = 0; index < climber.length; index++) {
+      const element = climber[index];
+      const dataObj={}
+      dataObj.timeOut=Date.now();
+      dataObj.status=false
+      dataObj.finalTime=((((Date.now()-element.timeIn)/1000)/60).toFixed(0))
+      
+      if (element.status===true) {
+        try {
+          await Climber.findByIdAndUpdate({_id:element._id},dataObj)
+  
+          ///////due logic for all//////////////
+          
+          let adultPrice = settingsEnd[0].adultPrice
+          let kidPrice = settingsEnd[0].kidPrice
+          let a = 1 //nr copii
+          let b = 1 //nr adulti
+          let c = kidPrice //pret copii
+          let d = adultPrice //pret adulti
+          let y = afterClimberEnd[index].finalTime//timp scurs
+          let kid = (a*c)
+          let adult = (b*d)
+          let kidOver35min = a*(c+(Math.ceil((y-35)/15))*5) // pret final rotunjit in sus
+          let adultOver35min = b*(d+(Math.ceil((y-35)/15))*5) // pret final rotunjit in sus
+          let aftertimeEnd={}
+  
+        if (element.kid===true) {
+          if (y <= 35) {
+            aftertimeEnd.due = kid
+            
+          }
+          else {
+            aftertimeEnd.due = kidOver35min
+            
+          }
+        }
+        if (element.adult===true) {
+          if (y <= 35) {
+            aftertimeEnd.due = adult
+            
+          }
+          else {
+            aftertimeEnd.due = adultOver35min
+            
+          }
+        }
+  
+        await Climber.findByIdAndUpdate({_id:afterClimberEnd[index]._id},aftertimeEnd)
+
+        const climbersDue = await Climber.find({_id:element._id}).select('due')
+        let climberDueObj={}
+        climberDueObj.climber=climbersDue[0]._id
+        climberDueObj.due=climbersDue[0].due
+    
+    
+        await Client.findOneAndUpdate({_id:req.params.id},{
+          $addToSet: {
+            dueList:climberDueObj
+        }
+        });
+
+        } catch (error) {
+          console.log(error);
+        }
+   
+      }
+       
+      
+    }
+    
+    
+    let timeEnd={}
+    timeEnd.timeOut = Date.now();
+    timeEnd.finalTime = ((((Date.now()-client.timeIn)/1000)/60).toFixed(0)) ///!!!!!!!!!!!!!!!!!!!!!!!!!!!!!in production needs to be in minutes
+    timeEnd.adultsRemaining = 0
+    timeEnd.kidsRemaining = 0
+    
+    await Client.findByIdAndUpdate(req.params.id, timeEnd, {
+      new: true,
+      runValidators: true
+    });
+
+
+        let fireBaseIdFrontend=req.params.fireBaseId
+        // console.log(fireBaseIdFrontend);
+
+        const adminDetails = await Admin.findOne({fireBaseId:fireBaseIdFrontend})
+      
+
+        
+        const clientQuery4Admin = await Client.findById(req.params.id)
+        let today = new Date();
+        let dd = String(today.getDate()).padStart(2, '0');
+        let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        let yyyy = today.getFullYear();
+        today = mm + '/' + dd + '/' + yyyy;
+
+        let adminLog = {}
+        adminLog.adminEmailName = `${adminDetails.name} / ${adminDetails.email}`
+        adminLog.adminFireBaseId = fireBaseIdFrontend
+        adminLog.clientName = `${clientQuery4Admin.name} / ${clientQuery4Admin.email}`
+        adminLog.start = `${clientQuery4Admin.startTime} / ${today}`
+        adminLog.time = clientQuery4Admin.finalTime
+        adminLog.due = clientQuery4Admin.dueList.reduce((prev, cur) => prev + cur.due, 0)
+        adminLog.kickOutStatus=false
+        adminLog.timestamp = Date.now()
+        
+      
+      await Admin.findOneAndUpdate({fireBaseId:fireBaseIdFrontend},{
+        $addToSet: {
+          activityHistory:adminLog
+      }
+      });
+      let clientLog={}
+        clientLog.admin=`${adminDetails.email}`
+        clientLog.totalTime=clientQuery4Admin.finalTime
+        clientLog.kids=clientQuery4Admin.kids
+        clientLog.adults=clientQuery4Admin.adults
+        clientLog.due=clientQuery4Admin.dueList.reduce((prev, cur) => prev + cur.due, 0)
+        clientLog.timeIn=`${clientQuery4Admin.startTime} / ${today}`
+        clientLog.dateLog = Date.now()
+      
+        await Client.findOneAndUpdate({_id:req.params.id},{
+            $addToSet: {
+              sessionHistory:clientLog
+          }
+          });
+
+    if (!client) {
+      return next(new AppError("No client found with that ID", 404));
+    }
+    var end = new Date() - start,
+    hrend = process.hrtime(hrstart)
+    res.status(200).json({
+      status: "success",
+      executionTime:hrend[0]
+    });
+    
+  
+    console.info('Execution time: %dms', end)
+    console.info('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000)
+    
+  } else {
+    if (client.status===false) { 
+      res.status(409).send({
+        message: 'Client inactive'
+     })
+    }
+    if (client.timeOut!==0) { 
+      res.status(409).send({
+        message: 'Time stopped'
+     })
+    }
+    
+    
+  }
+
+});
+
+//////////////////////////STOP ALL////////////////////////////
 
 
 
