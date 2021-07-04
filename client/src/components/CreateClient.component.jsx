@@ -13,7 +13,7 @@ const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
 
 function CreateClient(props){
-    const [capchaOK, setCapchaOk] = useState(true)
+    const [capchaOK, setCapchaOk] = useState(false)
     const [isLoading, setLoading] = useState(false);
     const [name,setName] = useState('');
     const [email,setEmail] = useState('');
