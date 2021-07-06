@@ -26,7 +26,8 @@ exports.createClient = catchAsync(async (req, res, next) => {
 exports.createClimber = catchAsync(async (req, res, next) => {
  
   const client = await Client.findById({_id:req.params.ownerId}).select('name + status + timeOut + finalTime + timeIn')
-  // console.log(client);
+  
+  
   let d = new Date();
   let n = d.toLocaleTimeString();
   let dataObj={}
@@ -139,14 +140,16 @@ const clients = await Client.find({'name' : new RegExp(search, 'i')})
 ///GET ACTIVE CLIENTS
 exports.getActiveClients = catchAsync(async (req, res, next) => {
   const clients = await Client.find({ status: true }).exec();
-  const settings = await Settings.find() 
+  const settings = await Settings.find()
+  const climbers = await Climber.find({'status':true}) 
     res.status(200).json({
         
         
         clients,
         adultPrice: settings[0].adultPrice,
         kidPrice: settings[0].kidPrice,
-        results: clients.length
+        results: clients.length,
+        totalInGym:climbers.length
     });
   });
 
@@ -310,6 +313,8 @@ exports.updateNoClimbers = catchAsync(async (req, res, next) => {
   let numbers={}
   numbers.adults = req.body.adults;
   numbers.kids = req.body.kids;
+  numbers.adultsRemaining = req.body.adults;
+  numbers.kidsRemaining = req.body.kids;
   numbers.noOfpeopleClimbing = parseInt(numbers.adults) + parseInt(numbers.kids)
   
   
@@ -891,7 +896,7 @@ exports.endIndividual = catchAsync(async (req, res, next) => {
   let dataObj={}
   dataObj.timeOut=Date.now()
   dataObj.status=false
-  dataObj.finalTime=((((Date.now()-climbers[0].timeIn)/1000)/60).toFixed(0))
+  dataObj.finalTime=((((Date.now()-climbers[0].timeIn)/1000)/60).toFixed(0))///////min in prod
   
 
   if (climbers[0].status===true) {
@@ -974,7 +979,11 @@ exports.endIndividual = catchAsync(async (req, res, next) => {
 });
 
 
+
+
 //////////////////////////STOP ALL////////////////////////////
+
+
 exports.timeEndAll = catchAsync(async (req, res, next) => {
   var start = Date.now()
   var hrstart = process.hrtime()
@@ -982,17 +991,26 @@ exports.timeEndAll = catchAsync(async (req, res, next) => {
   const climber = await Climber.find({'owner':req.params.id})
   
   const settingsEnd = await Settings.find()
-  const afterClimberEnd = await Climber.find({'owner':req.params.id})
-  
+  let adultPrice = settingsEnd[0].adultPrice
+  let kidPrice = settingsEnd[0].kidPrice
 
-  if (client.timeOut===0&&client.status===true) {
+  let a = 1 //nr copii
+  let b = 1 //nr adulti
+  let c = kidPrice //pret copii
+  let d = adultPrice //pret adulti
+
+  
+  
+  //////////////////////LOOP Start/////////////////////////////////////////////////////////////
+  if (client.timeOut===0 && client.status===true) {
 
     for (let index = 0; index < climber.length; index++) {
       const element = climber[index];
+
       const dataObj={}
       dataObj.timeOut=Date.now();
       dataObj.status=false
-      dataObj.finalTime=((((Date.now()-element.timeIn)/1000)/60).toFixed(0))
+      dataObj.finalTime=((((Date.now()-element.timeIn)/1000)/60).toFixed(0))////////min in prod
       
       if (element.status===true) {
         try {
@@ -1000,19 +1018,14 @@ exports.timeEndAll = catchAsync(async (req, res, next) => {
   
           ///////due logic for all//////////////
           
-          let adultPrice = settingsEnd[0].adultPrice
-          let kidPrice = settingsEnd[0].kidPrice
-          let a = 1 //nr copii
-          let b = 1 //nr adulti
-          let c = kidPrice //pret copii
-          let d = adultPrice //pret adulti
+          const afterClimberEnd = await Climber.find({'owner':req.params.id})
           let y = afterClimberEnd[index].finalTime//timp scurs
           let kid = (a*c)
           let adult = (b*d)
           let kidOver35min = a*(c+(Math.ceil((y-35)/15))*5) // pret final rotunjit in sus
           let adultOver35min = b*(d+(Math.ceil((y-35)/15))*5) // pret final rotunjit in sus
           let aftertimeEnd={}
-  
+          
         if (element.kid===true) {
           if (y <= 35) {
             aftertimeEnd.due = kid
@@ -1033,6 +1046,8 @@ exports.timeEndAll = catchAsync(async (req, res, next) => {
             
           }
         }
+        // console.log(`time: ${y}, due: ${aftertimeEnd.due}`);
+        // console.log(aftertimeEnd);
   
         await Climber.findByIdAndUpdate({_id:afterClimberEnd[index]._id},aftertimeEnd)
 
@@ -1040,7 +1055,8 @@ exports.timeEndAll = catchAsync(async (req, res, next) => {
         let climberDueObj={}
         climberDueObj.climber=climbersDue[0]._id
         climberDueObj.due=climbersDue[0].due
-    
+        
+        // console.log(climberDueObj);
     
         await Client.findOneAndUpdate({_id:req.params.id},{
           $addToSet: {
@@ -1056,7 +1072,10 @@ exports.timeEndAll = catchAsync(async (req, res, next) => {
        
       
     }
-    
+    //////////////////////LOOP End/////////////////////////////////////////////////////////////
+
+
+    ///////////////////////////LOGS/////////////////////////////////////////////////////////
     
     let timeEnd={}
     timeEnd.timeOut = Date.now();
@@ -1115,9 +1134,14 @@ exports.timeEndAll = catchAsync(async (req, res, next) => {
           }
           });
 
+
+    ///////////////////////////LOGS/////////////////////////////////////////////////////////
+
     if (!client) {
       return next(new AppError("No client found with that ID", 404));
     }
+
+    //////////// Exec time res //////////////////////////
     var end = new Date() - start,
     hrend = process.hrtime(hrstart)
     res.status(200).json({
@@ -1126,8 +1150,9 @@ exports.timeEndAll = catchAsync(async (req, res, next) => {
     });
     
   
-    console.info('Execution time: %dms', end)
-    console.info('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000)
+    // console.info('Execution time: %dms', end)
+    // console.info('Execution time (hr): %ds %dms', hrend[0], hrend[1] / 1000000)
+    //////////// Exec time res //////////////////////////
     
   } else {
     if (client.status===false) { 
@@ -1148,7 +1173,20 @@ exports.timeEndAll = catchAsync(async (req, res, next) => {
 
 //////////////////////////STOP ALL////////////////////////////
 
+////GET No of Climbers in Gym
+exports.noOfClimbersRoute = catchAsync(async (req, res, next) => {
 
+  const climbers = await Climber.find({'status':true})
+  let data
+  data = climbers.length
+  
+
+
+  res.status(200).json({
+      message:'Success',
+      totalInGym:data
+  });
+});
 
 
 

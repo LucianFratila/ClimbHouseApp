@@ -66,14 +66,7 @@ const SignupAdmin = () => {
           var user = app.auth().currentUser;
 
           user.sendEmailVerification().then(function() {
-            
             alert(`Confirmation email send to ${user.email}`)
-            
-
-
-            
-
-
           })
           
           

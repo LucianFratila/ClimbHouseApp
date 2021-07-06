@@ -433,6 +433,7 @@ function ClientList(){
     const[modal4SearchResults,setModal4SearchResults]=useState(false);
     const[reverseOrder,setReverseOrder]=useState(false)
     const[showLastCreated,setShowLastCreated]=useState(false)
+    const[totalInGym,setTotalInGym]=useState(0)
     
     
     let totalClimbers = clients.reduce((accumulator, current) => accumulator + current.noOfpeopleClimbing, 0);
@@ -472,15 +473,6 @@ function ClientList(){
         return b - a
     }
 
-    function calculateSeconds(a,b){
-        let total
-         
-            if (b===0) {
-                return total = 0
-            } else {
-                return total = ((a-b)/1000).toFixed(0)
-            }  
-    }
     function calculateMins(a,b){
         var total
          
@@ -518,6 +510,7 @@ function ClientList(){
         if(mounted){
             async function fetchData() {
                 const result = await axios.get(getFetchUrl())
+                
                 const searchResult = await axios.get(getFetchUrl4ActiveSearch())
                 if (query==='') {
                     setSearchClients([])
@@ -525,7 +518,7 @@ function ClientList(){
                     // console.log(searchResult.data.clients);
                     setSearchClients(searchResult.data.clients) 
                 }
-                
+                setTotalInGym(result.data.totalInGym)
                 setClients(result.data.clients);
                 setPriceAdults(result.data.adultPrice);
                 setPriceKids(result.data.kidPrice);
@@ -604,7 +597,7 @@ function ClientList(){
             <span style={{marginTop:'10px',marginLeft:'15px',marginRight:'15px'}}>
                 <h3>Active Clients </h3>
                 
-                <span style={{verticalAlign:'middle',display:'table-cell'}}>Total Climbers in Gym: {totalClimbers>20?<span style={{color:'red',fontSize:'40px'}}>{totalClimbers} {totalClimbersRemaining!==0?`/ Remaining (${totalClimbersRemaining})`:null} </span>:<span style={{color:'green',fontSize:'40px'}}>{totalClimbers}  {totalClimbersRemaining!==0?` / Remaining (${totalClimbersRemaining})`:null}</span>}</span>
+                <span style={{verticalAlign:'middle',display:'table-cell'}}>Total Climbers in Gym: <span style={totalInGym>20?{color:'red',fontSize:'40px'}:{color:'green',fontSize:'40px'}}>{totalInGym}</span> </span>
             </span>
 
             

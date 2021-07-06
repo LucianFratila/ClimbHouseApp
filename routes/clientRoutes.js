@@ -9,6 +9,10 @@ router
 .get(clientController.getAllClients)//get all clients
 
 router
+.route("/climbersInGym")
+.get(clientController.noOfClimbersRoute)//get no of peaople in gym
+
+router
 .route("/search4active/")
 .get(clientController.searchAllClients4ActivePage)//get all clients
 

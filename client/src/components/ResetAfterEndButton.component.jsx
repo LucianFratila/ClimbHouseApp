@@ -36,8 +36,10 @@ function ResetAfterEndButton(props){
     }, [isLoading]);
    
     const handleClick = () => {
-        props.refresh()
+        
         setLoading(true)
+        setTimeout(()=>{props.refresh()},2000)
+        
         
     };
 

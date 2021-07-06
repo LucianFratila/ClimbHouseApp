@@ -5,7 +5,7 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import FormControl from 'react-bootstrap/FormControl';
 import Spinner from 'react-bootstrap/Spinner'
 import Alert from 'react-bootstrap/Alert'
-
+import app from "../base";
 import axios from 'axios';
 
 import ReCAPTCHA from 'react-google-recaptcha'
@@ -13,7 +13,7 @@ const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
 
 function CreateClient(props){
-    const [capchaOK, setCapchaOk] = useState(false)
+    const [capchaOK, setCapchaOk] = useState(true)
     const [isLoading, setLoading] = useState(false);
     const [name,setName] = useState('');
     const [email,setEmail] = useState('');
