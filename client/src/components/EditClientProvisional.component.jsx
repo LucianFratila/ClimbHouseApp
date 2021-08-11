@@ -343,7 +343,7 @@ function EditClientProvisional(props) {
                         <ButtonGroup size="lg" className="mb-2">
                         {/* {!data.client.status?null:data.client.timeOut>0?<ResetAfterEndButton ClientId={data.client._id} refresh={refreshFunction}/>:<StopAll ClientId={data.client._id} refresh={refreshFunction}/>} */}
                         <ResetAfterEndButton ClientId={data.client._id} refresh={refreshFunction}/>
-                        <StopAll ClientId={data.client._id} due={dueTotal} refresh={refreshFunction}/>
+                        <StopAll ClientId={data.client._id} due={dueTotal} name={data.client.name} refresh={refreshFunction}/>
                         <Button variant='info' onClick={()=>{setShowCreateClimber(true)}}>Insert Climber</Button>
                         </ButtonGroup>
                         <span style={{marginLeft:'5px', fontSize:'25px'}}>Total due for stopped time : <b>{dueTotal}</b> lei</span>
