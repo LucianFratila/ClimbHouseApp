@@ -16,9 +16,8 @@ function StopIndividual(props){
     
  
   const stopClimbersIndividual= async(id)=>{
-    
-      
-    try {
+    if (confirm(`Stop ${props.name} ?`)) {
+      try {
         setLoading(true)
         await axios({
           method:'POST',
@@ -34,6 +33,12 @@ function StopIndividual(props){
       }
       setLoading(false)
       props.refresh()
+    } else {
+      setLoading(false)
+      props.refresh()
+    }
+      
+    
       
   }
   

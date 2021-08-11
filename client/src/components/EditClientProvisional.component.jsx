@@ -387,7 +387,7 @@ function EditClientProvisional(props) {
                                       <h4>{item.status===true?<span> <IoMdTimer size='1em'/> {calculateMins(Date.now(),item.timeIn)} min</span>:<span><IoMdStopwatch size='0.9em'/> {item.finalTime} min | $: {item.due}lei</span>}</h4>
                                           
                                           
-                                      <span><StopIndividual climberId={item._id} clientId={props.match.params.id} refresh={refreshFunction}/></span>
+                                      <span><StopIndividual climberId={item._id} name={item.name} clientId={props.match.params.id} refresh={refreshFunction}/></span>
                                       </Card.Body>
                                     </Card>
                                     </Col>

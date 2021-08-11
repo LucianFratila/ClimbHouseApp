@@ -17,23 +17,29 @@ function StopAll(props){
     
   const stopAll= async()=>{
     
+    if (confirm(`Stop ${props.name} ?`)) {
+      try {
+        setLoading(true)
+          await axios({
+            method:'POST',
+            url:`${SERVER_URL}/clients/endAll/${props.ClientId}/${superUser.uid}`,
+          }).then(res=> {setServerResponse({show:true,data:res.data})}) 
+        } catch (error) {
+          
+          
+          alert(error.response.data.message)
+        }
         
-    try {
-      setLoading(true)
-        await axios({
-          method:'POST',
-          url:`${SERVER_URL}/clients/endAll/${props.ClientId}/${superUser.uid}`,
-        }).then(res=> {setServerResponse({show:true,data:res.data})}) 
-      } catch (error) {
+        setTimeout(()=>{setServerResponse({show:false,data:''})},5000) 
+        props.refresh()
         
-        
-        alert(error.response.data.message)
-      }
-      
-      setTimeout(()=>{setServerResponse({show:false,data:''})},5000) 
+        setLoading(false)
+    } else {
       props.refresh()
-      
-      setLoading(false)
+        
+        setLoading(false)
+    }    
+    
       
   }
   

@@ -105,7 +105,8 @@ let limit = parseInt(req.query.limit)////number
 
 const active = await Client.find({ status: true }).exec();
 const clientsLength = await Client.find({});
-const clients = await Client.find({'name' : new RegExp(search, 'i')}).sort({ timeStamp: sort}).limit(limit)
+// const clients = await Client.find({'name' : new RegExp(search, 'i'),'email':new RegExp(search, 'i')}).sort({ timeStamp: sort}).limit(limit)
+const clients = await Client.find({ $or: [ { 'name' : new RegExp(search, 'i') }, { 'email':new RegExp(search, 'i') },{ 'phone':new RegExp(search, 'i') } ] }).sort({ timeStamp: sort}).limit(limit)
 const settings = await Settings.find()
   res.status(200).json({
       clients,

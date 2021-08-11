@@ -16,7 +16,7 @@ import Card from 'react-bootstrap/Card'
 import CardGroup from 'react-bootstrap/CardGroup'
 import ButtonGroup from 'react-bootstrap/ButtonGroup'
 import InputGroup from 'react-bootstrap/InputGroup'
-import { FaArrowAltCircleUp, FaArrowCircleDown } from 'react-icons/fa';
+import { FaArrowAltCircleUp, FaArrowCircleDown, FaSearch } from 'react-icons/fa';
 import StopAll from './StopAll.component';
 
 
@@ -168,7 +168,7 @@ function ClientListSuper(props){
                     
                     <InputGroup className="mb-2 mr-sm-2">
                         <InputGroup.Prepend>
-                        <InputGroup.Text>Search</InputGroup.Text>
+                        <InputGroup.Text><FaSearch/>(Phone,Email,Name)</InputGroup.Text>
                         </InputGroup.Prepend>
                         <FormControl  className="inlineFormInputGroupUsername2" type="text"  onChange={onChangeSearch} />
                     </InputGroup>
@@ -272,7 +272,7 @@ function ClientListSuper(props){
                                 :
                                 <span>
                                     <StartButton ClientId={client._id} refresh={refresh} status={client.status} />
-                                    <StopAll ClientId={client._id}  refresh={refresh}/>
+                                    <StopAll ClientId={client._id} name={client.name}  refresh={refresh}/>
                                 </span>
                                     
                                    

@@ -759,7 +759,7 @@ function ClientList(){
                                 {/* <StartButton ClientId={client._id} refresh={refresh} status={client.status} /> */}
                                 {/* <PauseButton ClientId={client._id} refresh={refresh} timeOut={client.timeOut} name={client.name} status={client.status} paused={client.pausedStatus}/> */}
                                 {/* {client.timeOut===0?null:<StopAll ClientId={client._id} refresh={refresh}/>} */}
-                                <StopAll ClientId={client._id} refresh={refresh}/>
+                                <StopAll ClientId={client._id} name={client.name} refresh={refresh}/>
                                 {/* <StopButton ClientId={client._id} refresh={refresh} timeOut={client.timeOut} status={client.status} name={client.name} paused={client.pausedStatus}/>  */}
                                     
                                 </ButtonGroup>
