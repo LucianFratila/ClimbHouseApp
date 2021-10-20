@@ -1178,6 +1178,8 @@ exports.timeEndAll = catchAsync(async (req, res, next) => {
 exports.noOfClimbersRoute = catchAsync(async (req, res, next) => {
 
   const climbers = await Climber.find({'status':true})
+  const settings = await Settings.find()
+  // console.log(settings[0].isOpen);
   let data
   data = climbers.length
   
@@ -1185,7 +1187,8 @@ exports.noOfClimbersRoute = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
       message:'Success',
-      totalInGym:data
+      totalInGym:data,
+      isOpen:settings[0].isOpen
   });
 });
 

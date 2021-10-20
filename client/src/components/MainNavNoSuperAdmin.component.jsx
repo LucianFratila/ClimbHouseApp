@@ -3,7 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 
 
-
+import IsOpenButton from "./isOpenGym.component";
 import logo from "../Logo-Climb-House-scris-white.png";
 import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
@@ -70,6 +70,9 @@ const logout = ()=>{
           
           <Nav.Item>
             <Nav.Link href="/rules">Rules</Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <IsOpenButton/>
           </Nav.Item>
         </Nav>
         <Navbar.Text >

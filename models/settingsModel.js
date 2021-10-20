@@ -8,6 +8,10 @@ let settingsSchema = mongoose.Schema({
         },
         kidPrice:{
             type:Number
+        },
+        isOpen:{
+            type:Boolean,
+            default:false
         }
         
    

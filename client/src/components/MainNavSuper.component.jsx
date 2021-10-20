@@ -5,7 +5,7 @@ import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
 import NavDropdown from 'react-bootstrap/NavDropdown'
 import React, { useContext } from 'react';
-
+import IsOpenButton from "./isOpenGym.component";
 import Button from "react-bootstrap/Button";
 import app from "../base";
 import { AuthContext } from "../Auth"
@@ -70,6 +70,9 @@ const logout = ()=>{
           
           <Nav.Item>
             <Nav.Link href="/rules"><b>Rules</b></Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <IsOpenButton/>
           </Nav.Item>
         </Nav>
         <Navbar.Text >
