@@ -1,38 +1,34 @@
-const { query } = require('express');
-const Client = require('../models/clientModel');
-const Settings = require('../models/settingsModel');
+const { query } = require("express");
+const Client = require("../models/clientModel");
+const Settings = require("../models/settingsModel");
 const AppError = require("./../utils/appError");
-const catchAsync = require('./../utils/catchAsync');
-
+const catchAsync = require("./../utils/catchAsync");
 
 ///CREATE NEW SETTINGS
 exports.createSettings = catchAsync(async (req, res, next) => {
-    const newSettings = await Settings.create(req.body);
-    
-    res.status(201).json({
-      status: 'success',
-      data: {
-        settings: newSettings,
-      },
-    });
+  const newSettings = await Settings.create(req.body);
+
+  res.status(201).json({
+    status: "success",
+    data: {
+      settings: newSettings,
+    },
   });
-
-
+});
 
 ///GET SETTINGS
 exports.getSettings = catchAsync(async (req, res, next) => {
-    const settings = await Settings.find()
-      res.status(200).json({
-          settings 
-      });
-    });
-
+  const settings = await Settings.find();
+  res.status(200).json({
+    settings,
+  });
+});
 
 ///UPDATE SETTINGS
 exports.updateSettings = catchAsync(async (req, res, next) => {
   const setting = await Settings.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
-    runValidators: true
+    runValidators: true,
   });
 
   if (!setting) {
@@ -41,6 +37,6 @@ exports.updateSettings = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
-    setting
+    setting,
   });
 });

@@ -1,5 +1,6 @@
 
 import "bootstrap/dist/css/bootstrap.min.css";
+import AllClients from "./features/allclients/main";
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import './index.css'
 import ClientList from "./components/ClientList.component";
@@ -48,6 +49,7 @@ function App() {
       
       <Switch>
       <PrivateRoute path = '/' exact component={ClientList}/>
+      <PrivateRoute path = '/allclients' exact component={AllClients}/> {/* TEST */}
       <SuperPrivateRouter path = '/cs' exact component={ClientListSuper}/>
       <PrivateRoute path = '/active' exact component={ActiveClientList}/>
       <PrivateRoute path = '/edit/:id' component={EditClientProvisional}/>

@@ -98,6 +98,9 @@ router
 .route("/resume/:id")
 .post(clientController.timeResume)//resume time for client by id
 
+router
+.route("/testlogic/:time")
+.post(clientController.endIndividualTest)//resume time for client by id
 
   
 
