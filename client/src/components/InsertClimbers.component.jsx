@@ -14,7 +14,7 @@ function InsertClimbers(props) {
   const [kids, setKids] = useState(0);
   const [miniKids, setMiniKids] = useState(0);
   const [show, setShow] = useState(false);
-  console.log(miniKids);
+  
   const onChangeAdults = (e) => {
     setAdults(e.target.value);
   };
