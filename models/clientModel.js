@@ -33,6 +33,10 @@ let clientsSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    terms:{
+        type: Boolean,
+        default: false
+    },
     startTime:{
         type: String,
         default:0
@@ -42,6 +46,10 @@ let clientsSchema = new mongoose.Schema({
         default:0
     },
     kids:{
+        type: Number,
+        default:0
+    },
+    minikids:{
         type: Number,
         default:0
     },

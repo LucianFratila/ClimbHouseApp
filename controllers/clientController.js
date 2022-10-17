@@ -40,14 +40,34 @@ exports.createClimber = catchAsync(async (req, res, next) => {
   if (req.body.climber === "adult") {
     dataObj.adult = true;
   }
+  if (req.body.climber === "minikid") {
+    dataObj.adult = true;
+  }
   if (req.body.climber === "kid") {
     dataObj.kid = true;
   }
   if (req.body.name === "") {
-    dataObj.name = `Unknown ${req.body.climber === "adult" ? "adult" : "kid"} climber`;
+    if (req.body.climber === "adult") {
+      dataObj.name = `Unknown adult climber`;
+    }
+    if (req.body.climber === "kid") {
+      dataObj.name = `Unknown kid climber`;
+    }
+    if (req.body.climber === "minikid") {
+      dataObj.name = `Unknown minikid climber`;
+    }
   } else {
-    dataObj.name = `${req.body.climber === "adult" ? "Adult" : "Kid"} climber: ${req.body.name}`;
+    if (req.body.climber === "adult") {
+      dataObj.name = `Adult climber: ${req.body.name}`;
+    }
+    if (req.body.climber === "kid") {
+      dataObj.name = `Kid climber: ${req.body.name}`;
+    }
+    if (req.body.climber === "minikid") {
+      dataObj.name = `Minikid climber: ${req.body.name}`;
+    }
   }
+
   // console.log(client.timeOut,client.finalTime,client.timeIn,client.status);
   if (client.timeIn > 0 && client.timeOut === 0 && client.finalTime === 0 && client.status === true) {
     try {
@@ -130,6 +150,7 @@ exports.getActiveClients = catchAsync(async (req, res, next) => {
     clients,
     adultPrice: settings[0].adultPrice,
     kidPrice: settings[0].kidPrice,
+    miniKidPrice: settings[0].miniKidPrice,
     results: clients.length,
     totalInGym: climbers.length,
   });
@@ -281,7 +302,8 @@ exports.updateNoClimbers = catchAsync(async (req, res, next) => {
   numbers.kids = req.body.kids;
   numbers.adultsRemaining = req.body.adults;
   numbers.kidsRemaining = req.body.kids;
-  numbers.noOfpeopleClimbing = parseInt(numbers.adults) + parseInt(numbers.kids);
+  numbers.minikids = req.body.minikids;
+  numbers.noOfpeopleClimbing = parseInt(numbers.adults) + parseInt(numbers.kids) + parseInt(numbers.minikids);
 
   const client = await Client.findByIdAndUpdate(req.params.id, numbers, {
     new: true,
@@ -378,7 +400,7 @@ exports.timeIN = catchAsync(async (req, res, next) => {
     runValidators: true,
   });
 
-  //////////////Start and Create Adults////////////////////////////////////
+  //////////////Start and Create Climber////////////////////////////////////
 
   const clientData = await Client.findById(req.params.id);
 
@@ -409,7 +431,20 @@ exports.timeIN = catchAsync(async (req, res, next) => {
 
     await Climber.create(dataAdults);
   }
-  //////////////Start and Create Adults////////////////////////////////////
+
+  for (let index = 0; index < clientData.minikids; index++) {
+    let dataAdults = {};
+    dataAdults.timeIn = clientData.timeIn;
+    dataAdults.startTime = clientData.startTime;
+    dataAdults.status = true;
+    dataAdults.name = `MiniKid ${index + 1}`;
+    dataAdults.minikid = true;
+    dataAdults.owner = req.params.id;
+    dataAdults.ownerName = clientData.name;
+
+    await Climber.create(dataAdults);
+  }
+  //////////////Start and Create Climber////////////////////////////////////
 
   if (!client) {
     return next(new AppError("No client found with that ID", 404));
@@ -793,26 +828,40 @@ exports.endIndividual = catchAsync(async (req, res, next) => {
       await Climber.findByIdAndUpdate({ _id: req.params.climberId }, dataObj);
       const adultsLength = await Climber.find({ owner: req.params.id, adult: true, status: true });
       const kidsLength = await Climber.find({ owner: req.params.id, kid: true, status: true });
+      const miniKidsLength = await Climber.find({ owner: req.params.id, minikid: true, status: true });
 
       let dataClientObj = {};
       dataClientObj.adultsRemaining = adultsLength.length;
       dataClientObj.kidsRemaining = kidsLength.length;
+      dataClientObj.minikidsRemaining = miniKidsLength.length;
       await Client.findByIdAndUpdate({ _id: req.params.id }, dataClientObj);
       ////////////individual due logic//////////////////////////////////
       const afterClimberEnd = await Climber.find({ _id: req.params.climberId });
       let adultPrice = settingsEnd[0].adultPrice;
       let kidPrice = settingsEnd[0].kidPrice;
+      let miniKidPrice = settingsEnd[0].miniKidPrice;
       let a = 1; //nr copii
       let b = 1; //nr adulti
+      let f = 1; //nr minikids
       let c = kidPrice; //pret copii
       let d = adultPrice; //pret adulti
+      let e = miniKidPrice; //pret minikids
       let y = afterClimberEnd[0].finalTime; //timp scurs
       let kid = a * (c - 10);
       let adult = b * (d - 10);
+      let minikid = f * (e - 10);
       // let kidOver35min = a * (c + Math.ceil((y - 35) / 15) * 5); // pret final rotunjit in sus
       // let adultOver35min = b * (d + Math.ceil((y - 35) / 15) * 5); // pret final rotunjit in sus
 
       let aftertimeEnd = {};
+      if (climbers[0].minikid === true) {
+        if (y <= 35) {
+          aftertimeEnd.due = minikid;
+        }
+        if (y >= 35.0001) {
+          aftertimeEnd.due = a * (e - 15 + Math.ceil((y - 35) / 15) * 2.5); // pret final rotunjit in sus
+        }
+      }
 
       if (climbers[0].kid === true) {
         if (y <= 35) {
@@ -838,20 +887,6 @@ exports.endIndividual = catchAsync(async (req, res, next) => {
         }
       }
 
-      // if (climbers[0].kid === true) {
-      //   if (y <= 35) {
-      //     aftertimeEnd.due = kid;
-      //   } else {
-      //     aftertimeEnd.due = kidOver35min;
-      //   }
-      // }
-      // if (climbers[0].adult === true) {
-      //   if (y <= 35) {
-      //     aftertimeEnd.due = adult;
-      //   } else {
-      //     aftertimeEnd.due = adultOver35min;
-      //   }
-      // }
       await Climber.findByIdAndUpdate({ _id: req.params.climberId }, aftertimeEnd);
 
       ////////////individual due logic//////////////////////////////////
@@ -894,11 +929,14 @@ exports.timeEndAll = catchAsync(async (req, res, next) => {
   const settingsEnd = await Settings.find();
   let adultPrice = settingsEnd[0].adultPrice;
   let kidPrice = settingsEnd[0].kidPrice;
+  let miniKidPrice = settingsEnd[0].miniKidPrice;
 
   let a = 1; //nr copii
   let b = 1; //nr adulti
+  let f = 1; //nr minikids
   let c = kidPrice; //pret copii
   let d = adultPrice; //pret adulti
+  let e = miniKidPrice; //pret adulti
 
   //////////////////////LOOP Start/////////////////////////////////////////////////////////////
   if (client.timeOut === 0 && client.status === true) {
@@ -919,6 +957,7 @@ exports.timeEndAll = catchAsync(async (req, res, next) => {
           const afterClimberEnd = await Climber.find({ owner: req.params.id });
           let y = afterClimberEnd[index].finalTime; //timp scurs
           let kid = a * (c - 10);
+          let minikid = a * (e - 10);
           let adult = b * (d - 10);
           // let kidOver35min = a * (c + Math.ceil((y - 35) / 15) * 5); // pret final rotunjit in sus
           // let adultOver35min = b * (d + Math.ceil((y - 35) / 15) * 5); // pret final rotunjit in sus
@@ -948,6 +987,15 @@ exports.timeEndAll = catchAsync(async (req, res, next) => {
             }
             if (y >= 125.0001) {
               aftertimeEnd.due = a * (c + 0 + Math.ceil((y - 35) / 15) * 5); // pret final rotunjit in sus
+            }
+          }
+
+          if (element.minikid === true) {
+            if (y <= 35) {
+              aftertimeEnd.due = minikid;
+            }
+            if (y >= 35.0001) {
+              aftertimeEnd.due = f * (e - 15 + Math.ceil((y - 35) / 15) * 2.5); // pret final rotunjit in sus
             }
           }
 
@@ -1096,6 +1144,34 @@ exports.noOfClimbersRoute = catchAsync(async (req, res, next) => {
     message: "Success",
     totalInGym: data,
     isOpen: settings[0].isOpen,
+  });
+});
+
+exports.termsToggle = catchAsync(async (req, res, next) => {
+  const client = await Client.findById(req.params.id);
+
+  if (client.terms === true) {
+    await Client.findByIdAndUpdate(
+      req.params.id,
+      { terms: false },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+  } else {
+    await Client.findByIdAndUpdate(
+      req.params.id,
+      { terms: true },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+  }
+  res.status(200).json({
+    message: "Success",
+    client,
   });
 });
 

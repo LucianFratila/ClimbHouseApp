@@ -58,15 +58,14 @@ function Settings(props){
     return(
         
             <Container >
-            <Row xl={2} lg={2} md={1} sm={1} xs={1} >
+            <Row  >
                 <Col>
                     <h3>Create product</h3>
                     <CreateProduct sendRefresh={refreshFunction}/>
-                </Col>
-                <Col>
-                    <h3>Edit gym price / per 30 min</h3>
+                    <h3>Edit gym price / per 1h</h3>
                     <EditGymPrice sendRefresh={refreshFunction}/>
                 </Col>
+            
                 
             
             

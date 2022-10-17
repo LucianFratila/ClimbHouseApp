@@ -21,7 +21,7 @@ import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
 import ListGroup from "react-bootstrap/ListGroup";
-import { FaArrowRight, FaDotCircle } from "react-icons/fa";
+import { FaArrowRight, FaCheckCircle, FaWindowClose } from "react-icons/fa";
 
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
@@ -186,6 +186,7 @@ function MyVerticallyCenteredModal(props) {
 function Search4ActiveCard({ id2Search, refresh, nos }) {
   const [adults, setAdults] = useState(0);
   const [kids, setKids] = useState(0);
+  const [minikids, setMiniKids] = useState(0);
   const [totalClimbers, setTotalClimbers] = useState(0);
   const [client, setClient] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -195,6 +196,9 @@ function Search4ActiveCard({ id2Search, refresh, nos }) {
   };
   const onChangeKids = (e) => {
     setKids(e.target.value);
+  };
+  const onChangeMiniKids = (e) => {
+    setMiniKids(e.target.value);
   };
 
   const insert = async () => {
@@ -207,6 +211,7 @@ function Search4ActiveCard({ id2Search, refresh, nos }) {
         data: {
           adults: adults,
           kids: kids,
+          minikids: minikids,
         },
       });
     } catch (err) {
@@ -220,7 +225,7 @@ function Search4ActiveCard({ id2Search, refresh, nos }) {
   const onSubmit = (e) => {
     e.preventDefault();
     insert();
-    setTotalClimbers(adults + kids);
+    setTotalClimbers(adults + kids + minikids);
   };
 
   function getFetchUrl(id) {
@@ -301,6 +306,18 @@ function Search4ActiveCard({ id2Search, refresh, nos }) {
                           onChange={onChangeKids}
                         />
                       </InputGroup>
+                      <InputGroup size='sm' className='mb-2 mr-sm-2'>
+                        <InputGroup.Prepend>
+                          <InputGroup.Text>MiniKids</InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <FormControl
+                          style={{ width: "60px" }}
+                          min='0'
+                          type='number'
+                          className='inlineFormInputGroupUsername2'
+                          onChange={onChangeMiniKids}
+                        />
+                      </InputGroup>
 
                       <Button type='submit' className='mb-2' size='sm' inline='true'>
                         Ok
@@ -326,6 +343,7 @@ function ClientList() {
   const [clients, setClients] = useState([]);
   const [priceKids, setPriceKids] = useState(0);
   const [priceAdults, setPriceAdults] = useState(0);
+  const [priceMinikids, setPriceMinikids] = useState(0);
   const [searchClients, setSearchClients] = useState([]);
   const [query, setQuery] = useState("");
   const [modal4SearchResults, setModal4SearchResults] = useState(false);
@@ -413,7 +431,9 @@ function ClientList() {
         setClients(result.data.clients);
         setPriceAdults(result.data.adultPrice);
         setPriceKids(result.data.kidPrice);
+        setPriceMinikids(result.data.miniKidPrice);
         // setDueTotal(result.data.data.client.dueList.reduce((prev, cur) => prev + cur.due, 0));
+        console.log(result.data);
       }
       fetchData();
     }
@@ -526,10 +546,18 @@ function ClientList() {
                       <span style={{ marginLeft: "3px", fontSize: "25px" }}>{client.name} ~ Paused</span>
                     ) : (
                       <span>
-                        <span style={{ marginLeft: "3px", fontSize: "25px" }}>{client.name} </span>
-                        {/* <span style={{fontSize:'15px',color:'white',marginLeft:'10px'}}>
-                                    (Adults:{client.adults}・Kids:{client.kids}) 
-                                </span> */}
+                        <span style={{ marginLeft: "3px", fontSize: "25px" }}>
+                          {client.terms ? (
+                            <>
+                              <FaCheckCircle color='green' style={{ margin: "0 4 0 0" }} size='1.4em' />
+                            </>
+                          ) : (
+                            <>
+                              <FaWindowClose color='red' style={{ margin: "0 4 0 0" }} size='1.4em' />
+                            </>
+                          )}{" "}
+                          {client.name}{" "}
+                        </span>
                       </span>
                     )}
 
@@ -560,35 +588,13 @@ function ClientList() {
                               </span>
                             ) : client.pausedStatus === false ? (
                               <span style={{ fontSize: "15px", color: "white", marginRight: "10px" }}>
-                                {/* {ctime(client.totalPaused, calculateMins(Date.now(), client.timeIn)) < 35 ? (
-                                  <span>
-                                    {ctime(client.totalPaused, calculateMins(Date.now(), client.timeIn))} / min - aprox.{" "}
-                                    {client.kids * priceKids + client.adults * priceAdults} / lei
-                                  </span>
-                                ) : (
-                                  <span>
-                                    {ctime(client.totalPaused, calculateMins(Date.now(), client.timeIn))} / min - aprox.{" "}
-                                    {client.kids *
-                                      (priceKids +
-                                        Math.ceil(
-                                          (ctime(client.totalPaused, calculateMins(Date.now(), client.timeIn)) - 35) /
-                                            15
-                                        ) *
-                                          5) +
-                                      client.adults *
-                                        (priceAdults +
-                                          Math.ceil(
-                                            (ctime(client.totalPaused, calculateMins(Date.now(), client.timeIn)) - 35) /
-                                              15
-                                          ) *
-                                            5)}{" "}
-                                    / lei
-                                  </span>
-                                )} */}
                                 {ctime(client.totalPaused, calculateMins(Date.now(), client.timeIn)) <= 35 ? (
                                   <span>
                                     {ctime(client.totalPaused, calculateMins(Date.now(), client.timeIn))} / min - aprox.{" "}
-                                    {client.kids * (priceKids - 10) + client.adults * (priceAdults - 10)} / lei
+                                    {client.kids * (priceKids - 10) +
+                                      client.adults * (priceAdults - 10) +
+                                      client.minikids * (priceMinikids - 10)}{" "}
+                                    / lei
                                   </span>
                                 ) : null}
                                 {ctime(client.totalPaused, calculateMins(Date.now(), client.timeIn)) >= 35.0001 &&
@@ -610,7 +616,15 @@ function ClientList() {
                                             (ctime(client.totalPaused, calculateMins(Date.now(), client.timeIn)) - 35) /
                                               15
                                           ) *
-                                            7.5)}{" "}
+                                            7.5) +
+                                      client.minikids *
+                                        (priceMinikids -
+                                          15 +
+                                          Math.ceil(
+                                            (ctime(client.totalPaused, calculateMins(Date.now(), client.timeIn)) - 35) /
+                                              15
+                                          ) *
+                                            2.5)}{" "}
                                     / lei
                                   </span>
                                 ) : null}
@@ -635,7 +649,16 @@ function ClientList() {
                                                 35) /
                                                 15
                                             ) *
-                                              5)}{" "}
+                                              5) +
+                                        client.minikids *
+                                          (priceMinikids -
+                                            15 +
+                                            Math.ceil(
+                                              (ctime(client.totalPaused, calculateMins(Date.now(), client.timeIn)) -
+                                                35) /
+                                                15
+                                            ) *
+                                              2.5)}{" "}
                                       / lei
                                     </span>
                                   </span>

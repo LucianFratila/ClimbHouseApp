@@ -102,6 +102,10 @@ router
 .route("/testlogic/:time")
 .post(clientController.endIndividualTest)//resume time for client by id
 
+router
+.route("/termstoggle/:id")
+.post(clientController.termsToggle)//resume time for client by id
+
   
 
 

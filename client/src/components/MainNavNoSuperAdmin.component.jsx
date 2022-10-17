@@ -31,7 +31,7 @@ function MainNavNoSuperAdmin({ history }) {
         </a>
       </Navbar.Brand>
       <Navbar.Brand>
-        <Navbar.Text>v 1.02</Navbar.Text>
+        <Navbar.Text>v 1.03</Navbar.Text>
       </Navbar.Brand>
       <Navbar.Toggle aria-controls='basic-navbar-nav' />
       <Navbar.Collapse id='basic-navbar-nav'>
