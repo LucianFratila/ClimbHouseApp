@@ -350,6 +350,7 @@ function ClientList() {
   const [reverseOrder, setReverseOrder] = useState(false);
   const [showLastCreated, setShowLastCreated] = useState(false);
   const [totalInGym, setTotalInGym] = useState(0);
+  const [loading, isLoading] = useState(false);
 
   let totalClimbers = clients.reduce((accumulator, current) => accumulator + current.noOfpeopleClimbing, 0);
   let totalClimbersRemaining = clients.reduce(
@@ -402,60 +403,55 @@ function ClientList() {
     }
   }, [alert]);
 
-  function getFetchUrl4ActiveSearch() {
-    return `${SERVER_URL}/clients/search4active/?search=${query}`;
-  }
+
   const onChangeSearch = (e) => {
     setQuery(e.target.value);
     // console.log(e.target.value);
   };
 
-  function getFetchUrl() {
-    return `${SERVER_URL}/clients/active`;
-  }
+  
+  /////////////////////////
   useEffect(() => {
     let mounted = true;
-
     if (mounted) {
       async function fetchData() {
-        const result = await axios.get(getFetchUrl());
-
-        const searchResult = await axios.get(getFetchUrl4ActiveSearch());
-        if (query === "") {
-          setSearchClients([]);
-        } else {
-          // console.log(searchResult.data.clients);
-          setSearchClients(searchResult.data.clients);
+        try {
+          isLoading(true);
+          const result = await axios.get(`${SERVER_URL}/clients/active`);
+          setTotalInGym(result.data.totalInGym);
+          setClients(result.data.clients);
+          setPriceAdults(result.data.adultPrice);
+          setPriceKids(result.data.kidPrice);
+          setPriceMinikids(result.data.miniKidPrice);
+          isLoading(false);
+        } catch (error) {
+          isLoading(false);
+          console.log(error);
         }
-        setTotalInGym(result.data.totalInGym);
-        setClients(result.data.clients);
-        setPriceAdults(result.data.adultPrice);
-        setPriceKids(result.data.kidPrice);
-        setPriceMinikids(result.data.miniKidPrice);
-        // setDueTotal(result.data.data.client.dueList.reduce((prev, cur) => prev + cur.due, 0));
-        console.log(result.data);
       }
       fetchData();
     }
-
     return () => {
       mounted = false;
     };
-  }, [alert, query, reverseOrder]);
+  }, [alert, reverseOrder]);
 
-  // console.log(searchClients);
-  // console.log(modal4SearchResults);
+  async function onClickSendQuery() {
+    try {
+      isLoading(true);
+      const result = await axios.get(`${SERVER_URL}/clients/search4active/?search=${query}`);
+      // console.log(result.data.clients);
+      setSearchClients(result.data.clients)
+      isLoading(false);
+    } catch (error) {
+      isLoading(false);
+      console.log(error);
+    }
+  }
 
   const refresh = () => {
     setAlert(true);
   };
-
-  // const toggleFilterClients =(e)=>{
-  //     e.preventDefault();
-  //     setReverseOrder(reverseOrder===true?false:true)
-  // }
-
-  // console.log(reverseOrder);
 
   return (
     <div>
@@ -496,9 +492,9 @@ function ClientList() {
           </span>
         </span>
       </Row>
-      <Row style={{ marginTop: "10px", marginLeft: "15px", marginRight: "15px" }}>
+      <Row>
         <Form inline>
-          <InputGroup className='mb-2 mr-sm-2'>
+          <InputGroup>
             <FormControl
               style={{ width: "200px" }}
               placeholder='Search'
@@ -506,18 +502,29 @@ function ClientList() {
               type='text'
               value={query}
               onChange={onChangeSearch}
+              
             />
-            <ButtonGroup>
-              <Button
+          </InputGroup>
+          <Button
+            onClick={(e) => {
+              e.preventDefault;
+              onClickSendQuery()
+            }}
+            variant='info'
+            disabled={query===''?true:false}
+          >
+            {loading ? <>Loading</> : <>Search</>}
+          </Button>
+          <Button style={{ margin: "10px" }} onClick={() => setShowLastCreated(true)}>
+            Last Created
+          </Button>
+          <Button
                 onClick={() => setModal4SearchResults(true)}
                 variant={searchClients.length === 0 ? "danger" : "success"}
                 disabled={searchClients.length === 0 ? true : false}
               >
                 Results: {searchClients.length}
               </Button>
-              <Button onClick={() => setShowLastCreated(true)}>Last Created</Button>
-            </ButtonGroup>
-          </InputGroup>
         </Form>
       </Row>
       <Row style={{ marginTop: "10px" }} xl={3} lg={2} md={2} sm={1} xs={1}>

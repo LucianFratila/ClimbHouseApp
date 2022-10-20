@@ -36,7 +36,7 @@ function ClientListSuper(props) {
   const sortListFunction = () => {
     setSort(sort === "asc" ? "desc" : "asc");
   };
-
+  console.log(clients.length);
   const [counter, setCounter] = useState(0);
 
   function useInterval(callback, delay) {
@@ -195,104 +195,122 @@ function ClientListSuper(props) {
               </span>
             </InputGroup>
           </Form>
+          {`Results: ${clients.length}`}
         </span>
       </Row>
       <Row style={{ marginTop: "10px" }} xl={4} lg={2} md={2} sm={1} xs={1}>
         {loading ? (
           <>
-            <Container>
-              <Row style={{ margin: "0px", position: "absolute", left: "50%", top: "50%" }}>
+            <Container style={{ marginLeft: "auto", marginRight: "auto", position: "relative" }}>
+              <Row>
                 <Col>
-                  <Spinner style={{ width: "150px", height: "150px" }} animation='border' variant='light' />
+                  <Spinner
+                    style={{ margin: "auto", display: "block", width: "150px", height: "150px" }}
+                    animation='grow'
+                    variant='light'
+                  />
                 </Col>
               </Row>
             </Container>
           </>
         ) : (
           <>
-            {clients.map((client) => (
-              <Col style={{ padding: "5px" }} key={client._id}>
-                <CardGroup>
-                  <Card border='dark' bg='dark' text='light' style={{ width: "auto", height: "auto" }} className='mb-2'>
-                    <Card.Header
-                      style={{
-                        background:
-                          client.timeOut > 0
-                            ? client.status === true
-                              ? "linear-gradient(180deg, rgba(130,0,0,1) 0%, rgba(171,8,8,1) 50%, rgba(255,0,0,1) 100%)"
-                              : "gray"
-                            : client.status === true
-                            ? "linear-gradient(180deg, rgba(71,120,1,1) 0%, rgba(104,150,8,1) 50%, rgba(107,186,1,1) 100%)"
-                            : "gray",
-                      }}
-                      className='mb-2 '
-                    >
-                      {client.pausedStatus === true ? (
-                        <span style={{ marginLeft: "3px", fontSize: "20px" }}>{client.name} ~ Paused</span>
-                      ) : (
-                        <span style={{ marginLeft: "3px", fontSize: "20px" }}>
-                          {client.terms ? (
-                            <>
-                              <FaCheckCircle color='green' style={{ margin: "0 4 0 0" }} size='1.4em' />
-                            </>
+            {clients.length == 0 ? (
+              <><Container><Row><Col>{`No results for: ${sendQuery}`}</Col></Row></Container></>
+            ) : (
+              <>
+                {clients.map((client) => (
+                  <Col style={{ padding: "5px" }} key={client._id}>
+                    
+                    <CardGroup>
+                      <Card
+                        border='dark'
+                        bg='dark'
+                        text='light'
+                        style={{ width: "auto", height: "auto" }}
+                        className='mb-2'
+                      >
+                        <Card.Header
+                          style={{
+                            background:
+                              client.timeOut > 0
+                                ? client.status === true
+                                  ? "linear-gradient(180deg, rgba(130,0,0,1) 0%, rgba(171,8,8,1) 50%, rgba(255,0,0,1) 100%)"
+                                  : "gray"
+                                : client.status === true
+                                ? "linear-gradient(180deg, rgba(71,120,1,1) 0%, rgba(104,150,8,1) 50%, rgba(107,186,1,1) 100%)"
+                                : "gray",
+                          }}
+                          className='mb-2 '
+                        >
+                          {client.pausedStatus === true ? (
+                            <span style={{ marginLeft: "3px", fontSize: "20px" }}>{client.name} ~ Paused</span>
                           ) : (
-                            <>
-                              <FaWindowClose color='red' style={{ margin: "0 4 0 0" }} size='1.4em' />
-                            </>
-                          )}{" "}
-                          {client.name}
-                        </span>
-                      )}
-                      <span style={{ float: "right" }}>
-                        <Link style={{ marginRight: "5px" }} className='btn btn-primary' to={"/edit/" + client._id}>
-                          Details
-                        </Link>
-                        {/* <DeleteButton ClientId={client._id} refresh={refresh} name={client.name} /> */}
-                      </span>
-                    </Card.Header>
-                    <Card.Body>
-                      <Card.Title>
-                        <span>
-                          <small style={{ color: "white" }}>
-                            <cite title='Source Title'>
-                              {client.noOfpeopleClimbing === 0 ? (
-                                "Add climbers to start"
-                              ) : client.timeOut > 0 ? (
-                                <span>
-                                  Started: {client.startTime} ~ {client.finalTime}/min @{" "}
-                                  {client.dueList.reduce((prev, cur) => prev + cur.due, 0)}/lei
-                                </span>
+                            <span style={{ marginLeft: "3px", fontSize: "20px" }}>
+                              {client.terms ? (
+                                <>
+                                  <FaCheckCircle color='green' style={{ margin: "0 4 0 0" }} size='1.4em' />
+                                </>
                               ) : (
-                                <span>Started: {client.startTime}</span>
-                              )}
-                            </cite>
-                          </small>
-                        </span>
-                      </Card.Title>
-
-                      <span>
-                        {client.noOfpeopleClimbing === 0 ? (
-                          <InsertClimbers
-                            noAdult={client.adults}
-                            refresh={refresh}
-                            noKids={client.kids}
-                            noMiniKids={client.minikids}
-                            ClientId={client._id}
-                          />
-                        ) : (
-                          <span>
-                            <StartButton ClientId={client._id} refresh={refresh} status={client.status} />
-                            <StopAll ClientId={client._id} refresh={refresh} />
+                                <>
+                                  <FaWindowClose color='red' style={{ margin: "0 4 0 0" }} size='1.4em' />
+                                </>
+                              )}{" "}
+                              {client.name}
+                            </span>
+                          )}
+                          <span style={{ float: "right" }}>
+                            <Link style={{ marginRight: "5px" }} className='btn btn-primary' to={"/edit/" + client._id}>
+                              Details
+                            </Link>
+                            {/* <DeleteButton ClientId={client._id} refresh={refresh} name={client.name} /> */}
                           </span>
-                        )}
+                        </Card.Header>
+                        <Card.Body>
+                          <Card.Title>
+                            <span>
+                              <small style={{ color: "white" }}>
+                                <cite title='Source Title'>
+                                  {client.noOfpeopleClimbing === 0 ? (
+                                    "Add climbers to start"
+                                  ) : client.timeOut > 0 ? (
+                                    <span>
+                                      Started: {client.startTime} ~ {client.finalTime}/min @{" "}
+                                      {client.dueList.reduce((prev, cur) => prev + cur.due, 0)}/lei
+                                    </span>
+                                  ) : (
+                                    <span>Started: {client.startTime}</span>
+                                  )}
+                                </cite>
+                              </small>
+                            </span>
+                          </Card.Title>
 
-                        {/* <InsertClimbers noAdult={client.adults} refresh={refresh} noKids={client.kids} ClientId={client._id}/> */}
-                      </span>
-                    </Card.Body>
-                  </Card>
-                </CardGroup>
-              </Col>
-            ))}
+                          <span>
+                            {client.noOfpeopleClimbing === 0 ? (
+                              <InsertClimbers
+                                noAdult={client.adults}
+                                refresh={refresh}
+                                noKids={client.kids}
+                                noMiniKids={client.minikids}
+                                ClientId={client._id}
+                              />
+                            ) : (
+                              <span>
+                                <StartButton ClientId={client._id} refresh={refresh} status={client.status} />
+                                <StopAll ClientId={client._id} refresh={refresh} />
+                              </span>
+                            )}
+
+                            {/* <InsertClimbers noAdult={client.adults} refresh={refresh} noKids={client.kids} ClientId={client._id}/> */}
+                          </span>
+                        </Card.Body>
+                      </Card>
+                    </CardGroup>
+                  </Col>
+                ))}
+              </>
+            )}
           </>
         )}
       </Row>
