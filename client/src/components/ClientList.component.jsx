@@ -152,7 +152,7 @@ function ClientListSuper(props) {
     <div>
       <Row>
         <span style={{ marginTop: "10px", marginLeft: "15px", marginRight: "15px" }}>
-          <h4>All Clients</h4>
+          <h4>Clients</h4>
           <h5>Create Client</h5>
           <CreateClient refresh={refresh} style={{ marginLeft: "5px" }} />
           {/* <SearchClientForm  refresh={refresh}/> */}
